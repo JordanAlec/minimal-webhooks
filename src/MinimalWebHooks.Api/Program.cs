@@ -8,9 +8,12 @@ namespace MinimalWebHooks.Api
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddMinimalWebhooksApi(optionsBuilder =>
+            builder.Services.AddMinimalWebhooksApi(dbContextOptions =>
             {
                 
+            }, webhookOptions =>
+            {
+
             });
             var app = builder.Build();
             app.UseMinimalWebhooksApi();

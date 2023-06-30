@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.Extensions;
 
 namespace MinimalWebHooks.Api.Extensions.Startup;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddMinimalWebhooksApi(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptions)
+    public static IServiceCollection AddMinimalWebhooksApi(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptions, Action<MinimalWebhookOptionsBuilder> webhookOptions)
     {
         services.AddAuthorization();
         services.AddEndpointsApiExplorer();
-        services.AddMinimalWebhooksCore(dbContextOptions);
+        services.AddMinimalWebhooksCore(dbContextOptions, webhookOptions);
         return services;
     }
 }

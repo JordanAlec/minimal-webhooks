@@ -12,11 +12,15 @@ namespace Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddMinimalWebhooksApi(optionsBuilder =>
+            builder.Services.AddMinimalWebhooksApi(dbContextOptions =>
             {
-                optionsBuilder.UseInMemoryDatabase("MinimalWebhooksDb");
-                optionsBuilder.EnableDetailedErrors();
-                optionsBuilder.EnableSensitiveDataLogging();
+                dbContextOptions.UseInMemoryDatabase("MinimalWebhooksDb");
+                dbContextOptions.EnableDetailedErrors();
+                dbContextOptions.EnableSensitiveDataLogging();
+            }, 
+                webhookOptions =>
+            {
+                webhookOptions.WebhookUrlIsReachable();
             });
 
             var app = builder.Build();

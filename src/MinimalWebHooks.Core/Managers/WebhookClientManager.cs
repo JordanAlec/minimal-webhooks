@@ -6,8 +6,13 @@ namespace MinimalWebHooks.Core.Managers;
 public class WebhookClientManager
 {
     private readonly IWebhookDataStore _dataStore;
+    private readonly IMinimalWebhookOptionsProcessor _optionsProcessor;
 
-    public WebhookClientManager(IWebhookDataStore dataStore) => _dataStore = dataStore;
+    public WebhookClientManager(IWebhookDataStore dataStore, IMinimalWebhookOptionsProcessor optionsProcessor)
+    {
+        _dataStore = dataStore;
+        _optionsProcessor = optionsProcessor;
+    }
 
     public async Task<WebhookDataResult> Get(int id)
     {
@@ -29,6 +34,7 @@ public class WebhookClientManager
 
     public async Task<WebhookDataResult> Create(WebhookClient client)
     {
+        if (!await _optionsProcessor.VerifyWebhookUrl(client)) return new WebhookDataResult().FailedResult($"Please verify your webhook url can receive a HEAD request. Cannot verify url is reachable.", client);
         var clientExists = await _dataStore.GetByName(client.Name);
         if (clientExists != null) return new WebhookDataResult().FailedResult($"Client already exists with this name. Potential duplication: {clientExists.Name}", clientExists);
         var savedClient = await _dataStore.Create(client);

@@ -4,7 +4,9 @@ namespace MinimalWebHooks.Tests
     {
         public class CanGetClients : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
-            public CanGetClients() : base(new MockWebhookDataStoreBuilder().SetupClients(FakeData.WebhookClients(1)))
+            public CanGetClients() : base(
+                new MockWebhookDataStoreBuilder().SetupClients(FakeData.WebhookClients(1)),
+                new MockMinimalWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
@@ -24,7 +26,7 @@ namespace MinimalWebHooks.Tests
 
         public class CannotFindClients : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
-            public CannotFindClients() : base(new MockWebhookDataStoreBuilder())
+            public CannotFindClients() : base(new MockWebhookDataStoreBuilder(), new MockMinimalWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
@@ -45,7 +47,9 @@ namespace MinimalWebHooks.Tests
         public class CanGetClientById : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanGetClientById() : base(new MockWebhookDataStoreBuilder().SetupClient(Client))
+            public CanGetClientById() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client),
+                new MockMinimalWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
@@ -67,7 +71,7 @@ namespace MinimalWebHooks.Tests
         {
             private static readonly int Id = 1;
 
-            public CannotFindClientById() : base(new MockWebhookDataStoreBuilder())
+            public CannotFindClientById() : base(new MockWebhookDataStoreBuilder(), new MockMinimalWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
@@ -88,7 +92,9 @@ namespace MinimalWebHooks.Tests
         public class CanSaveClient : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanSaveClient() : base(new MockWebhookDataStoreBuilder().SetupCreateClient(Client))
+            public CanSaveClient() : base(
+                new MockWebhookDataStoreBuilder().SetupCreateClient(Client),
+                new MockMinimalWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
             { }
 
             [Fact]
@@ -110,7 +116,9 @@ namespace MinimalWebHooks.Tests
         public class CannotSaveKnownClient : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CannotSaveKnownClient() : base(new MockWebhookDataStoreBuilder().SetupClient(Client).SetupCreateClient(Client))
+            public CannotSaveKnownClient() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupCreateClient(Client),
+                new MockMinimalWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
             { }
 
             [Fact]
@@ -119,6 +127,28 @@ namespace MinimalWebHooks.Tests
                 DataStore.Verify(x => x.GetByName(Client.Name), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
+
+            [Fact]
+            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+
+            public async Task InitializeAsync() => Result = await Manager.Create(Client);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CannotSaveClientWithNoVerifibleWebhookUrl : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient(emptyWebhookUrl: true);
+            public CannotSaveClientWithNoVerifibleWebhookUrl() : base(
+                new MockWebhookDataStoreBuilder(),
+                new MockMinimalWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, false))
+            { }
+
+            [Fact]
+            public void ClientWebhookUrlIsCheck() => OptionsProcessor.Verify(x => x.VerifyWebhookUrl(Client), Times.Once);
+
+            [Fact]
+            public void DataStoreIsNotChecked() => DataStore.VerifyNoOtherCalls();
 
             [Fact]
             public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
