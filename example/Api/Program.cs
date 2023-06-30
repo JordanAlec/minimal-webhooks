@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Extensions.Startup;
 
 namespace Api
@@ -11,7 +12,12 @@ namespace Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddMinimalWebhooksApi();
+            builder.Services.AddMinimalWebhooksApi(optionsBuilder =>
+            {
+                optionsBuilder.UseInMemoryDatabase("MinimalWebhooksDb");
+                optionsBuilder.EnableDetailedErrors();
+                optionsBuilder.EnableSensitiveDataLogging();
+            });
 
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
