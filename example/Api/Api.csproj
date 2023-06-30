@@ -16,4 +16,9 @@
     <ProjectReference Include="..\..\src\MinimalWebHooks.Api\MinimalWebHooks.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>
