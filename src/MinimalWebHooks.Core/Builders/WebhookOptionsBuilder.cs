@@ -2,21 +2,21 @@
 
 namespace MinimalWebHooks.Core.Builders;
 
-public class MinimalWebhookOptionsBuilder
+public class WebhookOptionsBuilder
 {
-    private readonly MinimalWebhookOptions _options;
+    private readonly WebhookOptions _options;
 
-    public MinimalWebhookOptionsBuilder() => _options = new MinimalWebhookOptions();
+    public WebhookOptionsBuilder() => _options = new WebhookOptions();
 
     /// <summary>
     /// Will check if the webhook client's webhook url responds to a HEAD request before creating the client.
     /// </summary>
     /// <returns></returns>
-    public MinimalWebhookOptionsBuilder WebhookUrlIsReachable()
+    public WebhookOptionsBuilder WebhookUrlIsReachable()
     {
         _options.VerifyWebhookUrl = true;
         return this;
     }
 
-    internal MinimalWebhookOptions Build() => _options;
+    internal WebhookOptions Build() => _options;
 }

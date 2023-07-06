@@ -1,4 +1,6 @@
-﻿namespace MinimalWebHooks.Tests.Builders;
+﻿using MinimalWebHooks.Core.Enum;
+
+namespace MinimalWebHooks.Tests.Builders;
 
 public class MockWebhookDataStoreBuilder
 {
@@ -11,6 +13,13 @@ public class MockWebhookDataStoreBuilder
     public MockWebhookDataStoreBuilder SetupClients(List<WebhookClient> clients)
     {
         _dataStore.Setup(x => x.Get())
+            .ReturnsAsync(clients);
+        return this;
+    }
+
+    public MockWebhookDataStoreBuilder SetupClientsGetByEntity(List<WebhookClient> clients)
+    {
+        _dataStore.Setup(x => x.GetByEntity(It.IsAny<object>(), It.IsAny<WebhookActionType>()))
             .ReturnsAsync(clients);
         return this;
     }

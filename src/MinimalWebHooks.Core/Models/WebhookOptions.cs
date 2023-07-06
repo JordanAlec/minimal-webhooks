@@ -1,6 +1,6 @@
 ﻿namespace MinimalWebHooks.Core.Models;
 
-public class MinimalWebhookOptions
+public class WebhookOptions
 {
     public bool VerifyWebhookUrl;
 }

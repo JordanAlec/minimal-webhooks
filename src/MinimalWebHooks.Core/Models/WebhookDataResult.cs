@@ -2,9 +2,9 @@
 
 public class WebhookDataResult
 {
-    public bool Success { get; set; }
-    public string Message { get; set; }
-    public List<WebhookClient> Data { get; set; }
+    public bool Success { get; private set; }
+    public string Message { get; private set; }
+    public List<WebhookClient> Data { get; }
 
     public WebhookDataResult() => Data = new List<WebhookClient>();
 

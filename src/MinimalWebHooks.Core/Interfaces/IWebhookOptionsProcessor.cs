@@ -2,7 +2,7 @@
 
 namespace MinimalWebHooks.Core.Interfaces;
 
-public interface IMinimalWebhookOptionsProcessor
+public interface IWebhookOptionsProcessor
 {
     Task<bool> VerifyWebhookUrl(WebhookClient client);
 }

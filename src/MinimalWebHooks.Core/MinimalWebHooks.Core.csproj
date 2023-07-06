@@ -12,10 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Managers\" />
-    <Folder Include="Builders\" />
+    <Folder Include="Enum\" />
+    <Folder Include="Http\" />
   </ItemGroup>
 
 </Project>

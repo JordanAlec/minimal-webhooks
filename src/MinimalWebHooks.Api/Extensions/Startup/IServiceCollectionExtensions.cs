@@ -6,7 +6,7 @@ namespace MinimalWebHooks.Api.Extensions.Startup;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddMinimalWebhooksApi(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptions, Action<MinimalWebhookOptionsBuilder> webhookOptions)
+    public static IServiceCollection AddMinimalWebhooksApi(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptions, Action<WebhookOptionsBuilder> webhookOptions)
     {
         services.AddAuthorization();
         services.AddEndpointsApiExplorer();

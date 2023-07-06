@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MinimalWebHooks.Core.Enum;
+using MinimalWebHooks.Core.Extensions;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 
@@ -17,6 +19,12 @@ public class WebhookDataStore : IWebhookDataStore
 
     public async Task<List<WebhookClient>?> Get() =>
         await _context.WebhookClients
+            .ToListAsync();
+
+    public async Task<List<WebhookClient>?> GetByEntity<T>(T data, WebhookActionType actionType) =>
+        await _context.WebhookClients
+            .Where(w => w.EntityTypeName.Equals(data.GetEntityTypeName(), StringComparison.InvariantCultureIgnoreCase))
+            .Where(w => w.ActionType == actionType)
             .ToListAsync();
 
     public async Task<WebhookClient?> Create(WebhookClient client)

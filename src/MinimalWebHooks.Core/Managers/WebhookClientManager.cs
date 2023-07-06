@@ -1,4 +1,5 @@
-﻿using MinimalWebHooks.Core.Interfaces;
+﻿using MinimalWebHooks.Core.Enum;
+using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 
 namespace MinimalWebHooks.Core.Managers;
@@ -6,9 +7,9 @@ namespace MinimalWebHooks.Core.Managers;
 public class WebhookClientManager
 {
     private readonly IWebhookDataStore _dataStore;
-    private readonly IMinimalWebhookOptionsProcessor _optionsProcessor;
+    private readonly IWebhookOptionsProcessor _optionsProcessor;
 
-    public WebhookClientManager(IWebhookDataStore dataStore, IMinimalWebhookOptionsProcessor optionsProcessor)
+    public WebhookClientManager(IWebhookDataStore dataStore, IWebhookOptionsProcessor optionsProcessor)
     {
         _dataStore = dataStore;
         _optionsProcessor = optionsProcessor;
@@ -26,6 +27,15 @@ public class WebhookClientManager
     public async Task<WebhookDataResult> Get()
     {
         var clients = await _dataStore.Get();
+
+        return clients != null && clients.Any()
+            ? new WebhookDataResult().SuccessfulResult($"Clients found.", clients.ToArray())
+            : new WebhookDataResult().FailedResult($"No clients found.");
+    }
+
+    public async Task<WebhookDataResult> GetByEntity<T>(T data, WebhookActionType actionType)
+    {
+        var clients = await _dataStore.GetByEntity(data, actionType);
 
         return clients != null && clients.Any()
             ? new WebhookDataResult().SuccessfulResult($"Clients found.", clients.ToArray())
