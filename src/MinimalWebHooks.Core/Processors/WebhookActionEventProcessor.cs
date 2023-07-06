@@ -12,9 +12,7 @@ public class WebhookActionEventProcessor : IWebhookActionEventProcessor
 
     public async Task<bool> WriteEvent(WebhookActionEvent webhookActionEvent)
     {
-        while (await _webhookActionEventChannel.Writer.WaitToWriteAsync())
-            _webhookActionEventChannel.Writer.TryWrite(webhookActionEvent);
-
+        await _webhookActionEventChannel.Writer.WriteAsync(webhookActionEvent);
         return _webhookActionEventChannel.Writer.TryComplete();
     }
 
