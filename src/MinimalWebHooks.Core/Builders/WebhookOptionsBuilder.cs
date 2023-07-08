@@ -1,4 +1,5 @@
-﻿using MinimalWebHooks.Core.Models;
+﻿using MinimalWebHooks.Core.Interfaces;
+using MinimalWebHooks.Core.Models;
 
 namespace MinimalWebHooks.Core.Builders;
 
@@ -15,6 +16,16 @@ public class WebhookOptionsBuilder
     public WebhookOptionsBuilder WebhookUrlIsReachable()
     {
         _options.VerifyWebhookUrl = true;
+        return this;
+    }
+
+    /// <summary>
+    /// Set's Serialiser for 'WebhookActionEvent's when sending events to Webhook client urls. Default uses: System.Text.Json.JsonSerializer
+    /// </summary>
+    /// <returns></returns>
+    public WebhookOptionsBuilder SetWebhookActionEventSerialiser(IWebhookActionEventSerialiser eventSerialiser)
+    {
+        _options.EventSerialiser = eventSerialiser;
         return this;
     }
 

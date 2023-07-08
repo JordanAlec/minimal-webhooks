@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Extensions.Startup;
+using MinimalWebHooks.Core.Serialisation;
 
 namespace Api
 {
@@ -21,6 +22,10 @@ namespace Api
                 webhookOptions =>
             {
                 webhookOptions.WebhookUrlIsReachable();
+
+                // This is not needed but if you want to send XML, use a 3rd party Json Serialiser you can. This is the default behaviour.
+                // If you want to create your own create an object that implements the 'IWebhookActionEventSerialiser' interface. 
+                webhookOptions.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser());
             });
 
             var app = builder.Build();

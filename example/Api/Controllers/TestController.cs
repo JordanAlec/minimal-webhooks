@@ -25,14 +25,14 @@ namespace Api.Controllers
 
 
         [HttpGet]
-        [Route("ExampleClientCreation")]
-        public async Task<IActionResult> Create()
+        [Route("ExampleClientCreation/{webhookUrl}")]
+        public async Task<IActionResult> Create([FromRoute] string webhookUrl)
         {
             // Assume we hit a 'POST' endpoint to create this below 'Alert'.
             var alert = new Alert { Id = 1, Status = "Alert", Title = "Super important" };
 
             // Lets create a webhook in code (you can do this via an API call as well) and it'll save into your datastore.
-            var clientExample = new WebhookClient {Id = 1, ActionType = WebhookActionType.Create, EntityTypeName = alert.GetEntityTypeName(), WebhookUrl = "https://webhook.site/d0280bbc-2643-498a-8812-c02a2728b68d", Name = "Alert Example Client"};
+            var clientExample = new WebhookClient {Id = 1, ActionType = WebhookActionType.Create, EntityTypeName = alert.GetEntityTypeName(), WebhookUrl = webhookUrl, Name = "Alert Example Client"};
             var clientCreationResult = await _clientsManager.Create(clientExample);
 
             // When you want to raise an 'Event' to send the webhook clients you write an event like below. This will only be sent to client that subscribe to the 'EntityTypeName' for 'Alert' and for 'Create' actions:

@@ -6,6 +6,7 @@ using MinimalWebHooks.Core.Http;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Managers;
 using MinimalWebHooks.Core.Processors;
+using MinimalWebHooks.Core.Serialisation;
 
 namespace MinimalWebHooks.Core.Extensions;
 
@@ -15,8 +16,11 @@ public static class IServiceCollectionExtensions
     {
         var webhookOptionsBuilder = new WebhookOptionsBuilder();
         webhookOptions(webhookOptionsBuilder);
+        var builtOptions = webhookOptionsBuilder.Build();
+        if (builtOptions.EventSerialiser == null) 
+            builtOptions = webhookOptionsBuilder.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser()).Build();
 
-        services.AddSingleton(webhookOptionsBuilder.Build());
+        services.AddSingleton(builtOptions);
         services.AddDbContext<MinimalWebhooksDbContext>(dbContextOptions);
         services.AddTransient<IWebhookClientHttpClient, WebhookClientHttpClient>();
         services.AddTransient<IWebhookDataStore, WebhookDataStore>();

@@ -1,11 +1,17 @@
 ﻿using System.Text;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Serialisation;
 
 namespace MinimalWebHooks.Core.Http;
 
 public class WebhookClientHttpClient : IWebhookClientHttpClient
 {
+    private readonly IWebhookActionEventSerialiser _eventSerialiser;
+    public WebhookClientHttpClient(WebhookOptions options)
+    {
+        _eventSerialiser = options.EventSerialiser ?? new DefaultWebhookActionEventSerialiser();
+    }
 
     public async Task<WebhookActionEventResult> SendEventToWebhookUrl(WebhookActionEvent webhookActionEvent, WebhookClient webhookClient)
     {
@@ -13,7 +19,7 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
         try
         {
             var response = await client.PostAsync(webhookClient.WebhookUrl,
-                new StringContent("", Encoding.UTF8, "application/json"));
+                new StringContent(_eventSerialiser.SerialiseEvent(webhookActionEvent), Encoding.UTF8, _eventSerialiser.GetMediaType()));
             var content = await response.Content.ReadAsStringAsync();
 
             return response.IsSuccessStatusCode ? 
