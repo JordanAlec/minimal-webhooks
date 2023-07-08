@@ -6,11 +6,11 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Alerts : ControllerBase
+    public class AlertsController : ControllerBase
     {
-        private readonly ILogger<Alerts> _logger;
+        private readonly ILogger<AlertsController> _logger;
 
-        public Alerts(ILogger<Alerts> logger) => _logger = logger;
+        public AlertsController(ILogger<AlertsController> logger) => _logger = logger;
 
         [HttpGet]
         public async Task<IActionResult> Get() =>
