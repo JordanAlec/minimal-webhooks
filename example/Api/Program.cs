@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Extensions.Startup;
 using MinimalWebHooks.Core.Serialisation;
@@ -18,8 +19,18 @@ namespace Api
                 dbContextOptions.UseInMemoryDatabase("MinimalWebhooksDb");
                 dbContextOptions.EnableDetailedErrors();
                 dbContextOptions.EnableSensitiveDataLogging();
-            }, 
-                webhookOptions =>
+            },
+            webhookApiOptions =>
+            {
+                // This allows you to mark the endpoints as anonymous or you can create whatever policy you'd like to protect the GET / CREATE / DELETE webhook client endpoints.
+
+                // If you don't use Authentication add the below line to allow anonymous access
+                webhookApiOptions.SetAuthorizationPolicy(new AuthorizationPolicyBuilder().RequireAssertion(context => true).Build());
+
+                // To set a genuine policy like below make sure you 'AddAuthentication' to your IServiceCollection.
+                //webhookApiOptions.SetAuthorizationPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+            },
+            webhookOptions =>
             {
                 webhookOptions.WebhookUrlIsReachable();
 

@@ -11,7 +11,11 @@ namespace MinimalWebHooks.Api
             builder.Services.AddMinimalWebhooksApi(dbContextOptions =>
             {
                 
-            }, webhookOptions =>
+            }, webhookApiOptions =>
+            {
+
+            },
+            webhookOptions =>
             {
 
             });
