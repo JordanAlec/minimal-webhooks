@@ -1,6 +1,8 @@
 ﻿using MinimalWebHooks.Core.Enum;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Validation;
+using MinimalWebHooks.Core.Validation.Rules;
 
 namespace MinimalWebHooks.Core.Managers;
 
@@ -44,10 +46,23 @@ public class WebhookClientManager
 
     public async Task<WebhookDataResult> Create(WebhookClient client)
     {
-        if (!await _optionsProcessor.VerifyWebhookUrl(client)) return new WebhookDataResult().FailedResult($"Please verify your webhook url can receive a HEAD request. Cannot verify url is reachable.", client);
+        var validationResult = await ValidateClient(client);
+        if (!validationResult.IsValid()) return new WebhookDataResult().FailedResult(validationResult.GetMessage(), client);
+
         var clientExists = await _dataStore.GetByName(client.Name);
         if (clientExists != null) return new WebhookDataResult().FailedResult($"Client already exists with this name. Potential duplication: {clientExists.Name}", clientExists);
         var savedClient = await _dataStore.Create(client);
         return savedClient != null ? new WebhookDataResult().SuccessfulResult($"Successfully created client.", savedClient) : new WebhookDataResult().FailedResult($"Failed to created client.", client);
+    }
+
+    private async Task<WebhookValidationResult> ValidateClient(WebhookClient client)
+    {
+        var validator = new WebhookClientValidator(client, new List<IValidationRule>
+        {
+            new WebhookClientHasRequiredProps(client),
+            new WebhookClientUrlCanBeReached(client, _optionsProcessor)
+        });
+
+        return await validator.ValidateClient();
     }
 }

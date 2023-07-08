@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Base\" />
+    <Folder Include="ValidationTests\" />
   </ItemGroup>
 
   <ItemGroup>

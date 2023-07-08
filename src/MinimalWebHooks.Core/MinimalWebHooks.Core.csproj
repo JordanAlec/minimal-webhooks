@@ -15,6 +15,7 @@
     <Folder Include="Managers\" />
     <Folder Include="Enum\" />
     <Folder Include="Http\" />
+    <Folder Include="Validation\Rules\" />
   </ItemGroup>
 
 </Project>
