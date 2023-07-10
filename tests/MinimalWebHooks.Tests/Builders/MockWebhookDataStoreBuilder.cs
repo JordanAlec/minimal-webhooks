@@ -24,9 +24,9 @@ public class MockWebhookDataStoreBuilder
         return this;
     }
 
-    public MockWebhookDataStoreBuilder SetupClient(WebhookClient client)
+    public MockWebhookDataStoreBuilder SetupClient(WebhookClient client, bool skipDisabledClients = true)
     {
-        _dataStore.Setup(x => x.GetById(client.Id))
+        _dataStore.Setup(x => x.GetById(client.Id, skipDisabledClients))
             .ReturnsAsync(client);
         _dataStore.Setup(x => x.GetByName(client.Name))
             .ReturnsAsync(client);
@@ -40,9 +40,9 @@ public class MockWebhookDataStoreBuilder
         return this;
     }
 
-    public MockWebhookDataStoreBuilder SetupDisableClient(WebhookClient client)
+    public MockWebhookDataStoreBuilder SetupUpdateClient(WebhookClient client)
     {
-        _dataStore.Setup(x => x.Disable(client))
+        _dataStore.Setup(x => x.Update(client))
             .ReturnsAsync(true);
         return this;
     }

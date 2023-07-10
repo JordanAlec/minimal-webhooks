@@ -7,8 +7,8 @@ public interface IWebhookDataStore
 {
     Task<List<WebhookClient>?> Get();
     Task<List<WebhookClient>?> GetByEntity<T>(T data, WebhookActionType actionType);
-    Task<WebhookClient?> GetById(int id);
+    Task<WebhookClient?> GetById(int id, bool skipDisabledClients = true);
     Task<WebhookClient?> GetByName(string name);
     Task<WebhookClient?> Create(WebhookClient client);
-    Task<bool> Disable(WebhookClient client);
+    Task<bool> Update(WebhookClient client);
 }

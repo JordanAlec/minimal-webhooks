@@ -29,4 +29,10 @@ public static class FakeData
     public static WebhookActionEvent WebhookActionEvent<T>(T data, WebhookActionType? actionType = null) => FakeWebhookActionEvent(data, actionType);
 
     public static List<WebhookActionEvent> WebhookActionEvents<T>(T data, int generate, WebhookActionType? actionType = null) => FakeWebhookActionEvent(data, actionType).Generate(generate);
+
+    public static WebhookUpdateCommand WebhookUpdateCommand(int id, bool disabledFlag, Dictionary<string, string> headers = null) =>
+        new Faker<WebhookUpdateCommand>()
+            .RuleFor(x => x.Id, id)
+            .RuleFor(x => x.SetDisabledFlag, disabledFlag)
+            .RuleFor(x => x.ReplaceHeaders, headers);
 }

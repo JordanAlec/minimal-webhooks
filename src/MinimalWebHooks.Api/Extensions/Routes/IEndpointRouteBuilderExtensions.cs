@@ -33,6 +33,12 @@ internal static class IEndpointRouteBuilderExtensions
             return client.Success ? Results.Ok(client) : Results.BadRequest(client);
         }).WithName("disableClient");
 
+        routerBuilder.MapPatch("/webhooks/clients", [Authorize(ApiConstants.Policy.WebhookPolicyName)] async ([FromBody] WebhookUpdateCommand command, [FromServices] WebhookClientManager manager) =>
+        {
+            var client = await manager.Update(command);
+            return client.Success ? Results.Ok(client) : Results.BadRequest(client);
+        }).WithName("updateClient");
+
         return routerBuilder;
     }
 }

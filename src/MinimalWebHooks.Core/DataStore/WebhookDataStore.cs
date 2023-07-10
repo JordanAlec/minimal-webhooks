@@ -12,8 +12,13 @@ public class WebhookDataStore : IWebhookDataStore
 
     public WebhookDataStore(MinimalWebhooksDbContext context) => _context = context;
 
-    public async Task<WebhookClient?> GetById(int id) =>
-        await _context.WebhookClients.FirstOrDefaultAsync(w => w.Id == id && !w.Disabled);
+    public async Task<WebhookClient?> GetById(int id, bool skipDisabledClients = true)
+    {
+        var clientsQueryable = _context.WebhookClients.AsQueryable().Where(x => x.Id == id);
+        if (skipDisabledClients) clientsQueryable = clientsQueryable.Where(x => !x.Disabled).AsQueryable();
+        return await clientsQueryable.FirstOrDefaultAsync();
+    }
+
     public async Task<WebhookClient?> GetByName(string name) =>
         await _context.WebhookClients.FirstOrDefaultAsync(w => w.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) && !w.Disabled);
 
@@ -35,13 +40,10 @@ public class WebhookDataStore : IWebhookDataStore
         return result > 0 ? client : null;
     }
 
-    public async Task<bool> Disable(WebhookClient client)
+    public async Task<bool> Update(WebhookClient client)
     {
-        client.Disabled = true;
         _context.WebhookClients.Update(client);
         var result = await _context.SaveChangesAsync();
         return result > 0;
     }
-
-
 }

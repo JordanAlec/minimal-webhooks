@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MinimalWebHooks.Core.Enum;
 
 namespace MinimalWebHooks.Tests
@@ -112,7 +113,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -137,7 +138,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetClient()
             {
-                DataStore.Verify(x => x.GetById(Id), Times.Once);
+                DataStore.Verify(x => x.GetById(Id, true), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -234,15 +235,15 @@ namespace MinimalWebHooks.Tests
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CanDisableClient() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupDisableClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupUpdateClient(Client),
+                new MockWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
             public void DataStoreCanGetAndDisableClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id), Times.Once);
-                DataStore.Verify(x => x.Disable(Client), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
+                DataStore.Verify(x => x.Update(Client), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -251,6 +252,9 @@ namespace MinimalWebHooks.Tests
 
             [Fact]
             public void ResultMessage() => Result.Message.Should().Contain($"Client disabled with Id: {Client.Id}.");
+
+            [Fact]
+            public void ClientDisabled() => Result.Data.First().Disabled.Should().BeTrue();
 
             public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
 
@@ -261,14 +265,14 @@ namespace MinimalWebHooks.Tests
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CannotDisableClient() : base(
-                new MockWebhookDataStoreBuilder().SetupDisableClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
+                new MockWebhookOptionsProcessorBuilder())
             { }
 
             [Fact]
-            public void DataStoreCanGetAndDisableClient()
+            public void DataStoreCanGetOnly()
             {
-                DataStore.Verify(x => x.GetById(Client.Id), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -279,6 +283,70 @@ namespace MinimalWebHooks.Tests
             public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
 
             public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CanUpdateClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, new Dictionary<string, string>{{ "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" }});
+
+            public CanUpdateClient() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
+                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndUpdateClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+
+            [Fact]
+            public void ClientUpdated()
+            {
+                Result.Data.First().Disabled.Should().BeTrue();
+                Result.Data.First().Headers.Should().ContainKeys("Authorization");
+            }
+
+            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CannotUpdateClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+
+            public CannotUpdateClient() : base(
+                new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
+                new MockWebhookOptionsProcessorBuilder())
+            { }
+
+            [Fact]
+            public void DataStoreCanGetOnly()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
+
+            public async Task InitializeAsync() => Result = await Manager.Update(Command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }

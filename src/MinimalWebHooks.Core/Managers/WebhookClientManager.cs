@@ -59,11 +59,25 @@ public class WebhookClientManager
     {
         var client = await _dataStore.GetById(id);
         if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {id}.");
-        var deleteResult = await _dataStore.Disable(client);
-        return deleteResult 
+        client.Disabled = true;
+        var disableResult = await _dataStore.Update(client);
+        return disableResult
             ? new WebhookDataResult().SuccessfulResult($"Client disabled with Id: {id}.", client)
             : new WebhookDataResult().FailedResult($"Client not disabled with Id: {id}.", client);
 
+    }
+
+    public async Task<WebhookDataResult> Update(WebhookUpdateCommand command)
+    {
+        var client = await _dataStore.GetById(command.Id, skipDisabledClients: false);
+        if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {command.Id}.");
+        if (command.SetDisabledFlag) client.Disabled = true;
+        if (command.HasHeaderReplacements()) client.Headers = command.ReplaceHeaders;
+        var updateResult = await _dataStore.Update(client);
+
+        return updateResult
+            ? new WebhookDataResult().SuccessfulResult($"Client updated with Id: {command.Id}.", client)
+            : new WebhookDataResult().FailedResult($"Client not updated with Id: {command.Id}.", client);
     }
 
     private async Task<WebhookValidationResult> ValidateClient(WebhookClient client)
