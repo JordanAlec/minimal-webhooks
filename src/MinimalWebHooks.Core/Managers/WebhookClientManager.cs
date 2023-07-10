@@ -1,6 +1,7 @@
 ﻿using MinimalWebHooks.Core.Enum;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Models.DbSets;
 using MinimalWebHooks.Core.Validation;
 using MinimalWebHooks.Core.Validation.Rules;
 
@@ -72,7 +73,11 @@ public class WebhookClientManager
         var client = await _dataStore.GetById(command.Id, skipDisabledClients: false);
         if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {command.Id}.");
         if (command.SetDisabledFlag) client.Disabled = true;
-        if (command.HasHeaderReplacements()) client.Headers = command.ReplaceHeaders;
+        if (command.HasHeaderReplacements())
+        {
+            await _dataStore.Delete(client.ClientHeaders);
+            client.ClientHeaders = command.ReplaceHeaders;
+        }
         var updateResult = await _dataStore.Update(client);
 
         return updateResult

@@ -1,4 +1,4 @@
-﻿using MinimalWebHooks.Core.Models;
+﻿using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Core.Validation;
 

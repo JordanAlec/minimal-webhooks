@@ -1,4 +1,6 @@
-﻿namespace MinimalWebHooks.Core.Models;
+﻿using MinimalWebHooks.Core.Models.DbSets;
+
+namespace MinimalWebHooks.Core.Models;
 
 public class WebhookDataResult
 {

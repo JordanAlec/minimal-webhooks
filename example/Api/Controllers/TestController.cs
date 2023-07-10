@@ -1,10 +1,10 @@
-﻿using Api.Data;
-using Api.Models;
+﻿using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using MinimalWebHooks.Core.Enum;
 using MinimalWebHooks.Core.Extensions;
 using MinimalWebHooks.Core.Managers;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace Api.Controllers
 {

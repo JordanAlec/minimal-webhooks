@@ -1,4 +1,4 @@
-﻿using MinimalWebHooks.Core.Models;
+﻿using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Core.Http;
 
@@ -7,8 +7,8 @@ public static class HttpClientWithWebhookFactory
     public static HttpClient Create(WebhookClient webhookClient)
     {
         var client = new HttpClient();
-        if (webhookClient.Headers != null && webhookClient.Headers.Any())
-            foreach (var header in webhookClient.Headers)
+        if (webhookClient.HasHeaders())
+            foreach (var header in webhookClient.ClientHeaders)
                 client.DefaultRequestHeaders.Add(header.Key, header.Value);
         
         return client;

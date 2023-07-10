@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using MinimalWebHooks.Core.Enum;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Tests
 {
@@ -301,6 +302,7 @@ namespace MinimalWebHooks.Tests
             public void DataStoreCanGetAndUpdateClient()
             {
                 DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.Verify(x => x.Delete(Client.ClientHeaders), Times.Once);
                 DataStore.Verify(x => x.Update(Client), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
@@ -315,8 +317,42 @@ namespace MinimalWebHooks.Tests
             public void ClientUpdated()
             {
                 Result.Data.First().Disabled.Should().BeTrue();
-                Result.Data.First().Headers.Should().ContainKeys("Authorization");
+                Result.Data.First().ClientHeaders?.Should().HaveCount(1);
+                Result.Data.First().ClientHeaders?.First().Key.Should().Be("Authorization");
+                Result.Data.First().ClientHeaders?.First().Value.Should().Be("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
             }
+
+            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CanUpdateClientNoReplacementHeaders : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true);
+
+            public CanUpdateClientNoReplacementHeaders() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
+                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndUpdateClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+
+            [Fact]
+            public void ClientUpdated() => Result.Data.First().Disabled.Should().BeTrue();
 
             public async Task InitializeAsync() => Result = await Manager.Update(Command);
 

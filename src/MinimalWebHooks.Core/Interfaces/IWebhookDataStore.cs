@@ -1,5 +1,5 @@
 ﻿using MinimalWebHooks.Core.Enum;
-using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Core.Interfaces;
 
@@ -11,4 +11,5 @@ public interface IWebhookDataStore
     Task<WebhookClient?> GetByName(string name);
     Task<WebhookClient?> Create(WebhookClient client);
     Task<bool> Update(WebhookClient client);
+    Task<bool> Delete(List<WebhookClientHeader> headers);
 }

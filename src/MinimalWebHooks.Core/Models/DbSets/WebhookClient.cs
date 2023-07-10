@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MinimalWebHooks.Core.Enum;
 
-namespace MinimalWebHooks.Core.Models;
+namespace MinimalWebHooks.Core.Models.DbSets;
 
 public class WebhookClient
 {
@@ -15,6 +15,7 @@ public class WebhookClient
     [Required]
     public string EntityTypeName { get; set; }
     public bool Disabled { get; set; }
+    public List<WebhookClientHeader>? ClientHeaders { get; set; }
 
-    public Dictionary<string, string>? Headers { get; set; }
+    public bool HasHeaders() => ClientHeaders != null && ClientHeaders.Any();
 }

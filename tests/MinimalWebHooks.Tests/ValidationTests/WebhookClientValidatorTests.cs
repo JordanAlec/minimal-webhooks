@@ -1,5 +1,6 @@
 ﻿using MinimalWebHooks.Core.Validation.Rules;
 using MinimalWebHooks.Core.Validation;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Tests.ValidationTests;
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MinimalWebHooks.Core.Managers;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Api.Extensions.Routes;
 

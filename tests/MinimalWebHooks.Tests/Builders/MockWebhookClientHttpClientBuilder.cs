@@ -1,4 +1,6 @@
-﻿namespace MinimalWebHooks.Tests.Builders;
+﻿using MinimalWebHooks.Core.Models.DbSets;
+
+namespace MinimalWebHooks.Tests.Builders;
 
 public class MockWebhookClientHttpClientBuilder
 {
