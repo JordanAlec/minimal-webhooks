@@ -72,7 +72,7 @@ public class WebhookClientManager
     {
         var client = await _dataStore.GetById(command.Id, skipDisabledClients: false);
         if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {command.Id}.");
-        if (command.SetDisabledFlag) client.Disabled = true;
+        client.Disabled = command.SetDisabledFlag;
         if (command.HasHeaderReplacements())
         {
             await _dataStore.Delete(client.ClientHeaders);
