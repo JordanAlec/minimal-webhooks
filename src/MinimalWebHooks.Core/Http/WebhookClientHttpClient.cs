@@ -15,7 +15,7 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
 
     public async Task<WebhookActionEventResult> SendEventToWebhookUrl(WebhookActionEvent webhookActionEvent, WebhookClient webhookClient)
     {
-        var client = new HttpClient();
+        var client = HttpClientWithWebhookFactory.Create(webhookClient);
         try
         {
             var response = await client.PostAsync(webhookClient.WebhookUrl,
@@ -30,7 +30,6 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
         {
             return new WebhookActionEventResult().FailedResult(webhookActionEvent, webhookClient, ex.Message);
         }
-        
     }
 
     public async Task<bool> VerifyWebhookUrl(WebhookClient client)

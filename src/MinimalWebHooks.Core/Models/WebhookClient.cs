@@ -15,4 +15,6 @@ public class WebhookClient
     [Required]
     public string EntityTypeName { get; set; }
     public bool Disabled { get; set; }
+
+    public Dictionary<string, string>? Headers { get; set; }
 }
