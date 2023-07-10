@@ -39,4 +39,11 @@ public class MockWebhookDataStoreBuilder
             .ReturnsAsync(client);
         return this;
     }
+
+    public MockWebhookDataStoreBuilder SetupDisableClient(WebhookClient client)
+    {
+        _dataStore.Setup(x => x.Disable(client))
+            .ReturnsAsync(true);
+        return this;
+    }
 }

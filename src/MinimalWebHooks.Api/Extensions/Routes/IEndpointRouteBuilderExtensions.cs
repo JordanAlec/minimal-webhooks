@@ -27,6 +27,12 @@ internal static class IEndpointRouteBuilderExtensions
             return client.Success ? Results.Ok(client) : Results.BadRequest(client);
         }).WithName("createClient");
 
+        routerBuilder.MapDelete("/webhooks/clients/{id}", [Authorize(ApiConstants.Policy.WebhookPolicyName)] async ([FromRoute] int id, [FromServices] WebhookClientManager manager) =>
+        {
+            var client = await manager.Disable(id);
+            return client.Success ? Results.Ok(client) : Results.BadRequest(client);
+        }).WithName("disableClient");
+
         return routerBuilder;
     }
 }

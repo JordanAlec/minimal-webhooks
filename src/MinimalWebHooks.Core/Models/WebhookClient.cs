@@ -14,4 +14,5 @@ public class WebhookClient
     public WebhookActionType ActionType { get; set; }
     [Required]
     public string EntityTypeName { get; set; }
+    public bool Disabled { get; set; }
 }

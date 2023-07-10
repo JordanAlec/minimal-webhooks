@@ -10,4 +10,5 @@ public interface IWebhookDataStore
     Task<WebhookClient?> GetById(int id);
     Task<WebhookClient?> GetByName(string name);
     Task<WebhookClient?> Create(WebhookClient client);
+    Task<bool> Disable(WebhookClient client);
 }

@@ -12,7 +12,8 @@ public static class FakeData
             .RuleFor(x => x.Name, f => f.Name.FullName())
             .RuleFor(x => x.WebhookUrl, f => f.Internet.Url())
             .RuleFor(x => x.ActionType, f => actionType ?? f.PickRandom<WebhookActionType>())
-            .RuleFor(x => x.EntityTypeName, f => f.Random.Word());
+            .RuleFor(x => x.EntityTypeName, f => f.Random.Word())
+            .RuleFor(x => x.Disabled, false);
 
     public static WebhookClient WebhookClient(WebhookActionType? actionType = null) => FakeWebhookClient(actionType);
 

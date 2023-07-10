@@ -56,10 +56,19 @@ public class WebhookClientValidatorTests
     }
 
     [Fact]
+    public async Task ValidationFailureDisabledClient()
+    {
+        var client = FakeData.WebhookClient();
+        client.Disabled = true;
+        var optionsBuilder = new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(client, true);
+        await TestValidationResult(client, optionsBuilder, false, "Client must have 'Disabled' set as false. Client 'WebhookUrl' has been verified with a HEAD request or 'WebhookUrlIsReachable' has not been set.");
+    }
+
+    [Fact]
     public async Task ValidationFailureCannotVerifyUrl()
     {
         var client = FakeData.WebhookClient();
         var optionsBuilder = new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(client, false);
-        await TestValidationResult(client, optionsBuilder, false, "Passed validation: WebhookClientHasRequiredProps. Cannot verifiy client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
+        await TestValidationResult(client, optionsBuilder, false, "Passed validation: WebhookClientHasRequiredProps. Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
     }
 }

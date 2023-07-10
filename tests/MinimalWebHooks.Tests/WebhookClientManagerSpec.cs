@@ -21,6 +21,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Clients found.");
+
             public async Task InitializeAsync() => Result = await Manager.Get();
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -44,6 +47,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Clients found.");
+
             public async Task InitializeAsync() => Result = await Manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -64,6 +70,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("No clients found.");
+
             public async Task InitializeAsync() => Result = await Manager.Get();
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -83,6 +92,9 @@ namespace MinimalWebHooks.Tests
 
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("No clients found.");
 
             public async Task InitializeAsync() => Result = await Manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
 
@@ -107,6 +119,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client found with Id: {Client.Id}.");
+
             public async Task InitializeAsync() => Result = await Manager.Get(Client.Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -129,6 +144,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Client not found with Id: 1.");
+
             public async Task InitializeAsync() => Result = await Manager.Get(Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -143,7 +161,7 @@ namespace MinimalWebHooks.Tests
             { }
 
             [Fact]
-            public void DataStoreCanGetButNotCreateClient()
+            public void DataStoreCanGetAndCreateClient()
             {
                 DataStore.Verify(x => x.GetByName(Client.Name), Times.Once);
                 DataStore.Verify(x => x.Create(Client), Times.Once);
@@ -152,6 +170,9 @@ namespace MinimalWebHooks.Tests
 
             [Fact]
             public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Successfully created client.");
 
             public async Task InitializeAsync() => Result = await Manager.Create(Client);
 
@@ -176,6 +197,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Client already exists with this name.");
+
             public async Task InitializeAsync() => Result = await Manager.Create(Client);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
@@ -198,7 +222,63 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
 
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
+
             public async Task InitializeAsync() => Result = await Manager.Create(Client);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CanDisableClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            public CanDisableClient() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupDisableClient(Client),
+                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndDisableClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id), Times.Once);
+                DataStore.Verify(x => x.Disable(Client), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client disabled with Id: {Client.Id}.");
+
+            public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CannotDisableClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            public CannotDisableClient() : base(
+                new MockWebhookDataStoreBuilder().SetupDisableClient(Client),
+                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndDisableClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
+
+            public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }

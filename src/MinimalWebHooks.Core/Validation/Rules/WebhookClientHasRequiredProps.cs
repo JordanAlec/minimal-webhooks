@@ -14,6 +14,7 @@ public class WebhookClientHasRequiredProps : IValidationRule
         if (string.IsNullOrWhiteSpace(_client.Name)) return new ValidationResult().Failure("Client must have 'Name'.");
         if (string.IsNullOrWhiteSpace(_client.WebhookUrl)) return new ValidationResult().Failure("Client must have 'WebhookUrl'.");
         if (string.IsNullOrWhiteSpace(_client.EntityTypeName)) return new ValidationResult().Failure("Client must have 'EntityTypeName'.");
+        if (_client.Disabled) return new ValidationResult().Failure("Client must have 'Disabled' set as false.");
 
         return new ValidationResult().Success($"Passed validation: {nameof(WebhookClientHasRequiredProps)}.");
     }

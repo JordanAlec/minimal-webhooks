@@ -33,9 +33,10 @@ namespace Api
             {
                 webhookOptions.WebhookUrlIsReachable();
 
-                // This is not needed but if you want to send XML, use a 3rd party Json Serialiser you can. This is the default behaviour.
+                // You can choose how you want to send data to the webhook URL. The 'IWebhookActionEventSerialiser' interface lets you define the media type and how Events are serialised.
+                // The default behaviour is to use JSON and use System.Text.Json.JsonSerializer.Serialize();
                 // If you want to create your own create an object that implements the 'IWebhookActionEventSerialiser' interface. 
-                webhookOptions.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser());
+                // webhookOptions.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser());
             });
 
             var app = builder.Build();

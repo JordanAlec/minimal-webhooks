@@ -55,6 +55,17 @@ public class WebhookClientManager
         return savedClient != null ? new WebhookDataResult().SuccessfulResult($"Successfully created client.", savedClient) : new WebhookDataResult().FailedResult($"Failed to created client.", client);
     }
 
+    public async Task<WebhookDataResult> Disable(int id)
+    {
+        var client = await _dataStore.GetById(id);
+        if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {id}.");
+        var deleteResult = await _dataStore.Disable(client);
+        return deleteResult 
+            ? new WebhookDataResult().SuccessfulResult($"Client disabled with Id: {id}.", client)
+            : new WebhookDataResult().FailedResult($"Client not disabled with Id: {id}.", client);
+
+    }
+
     private async Task<WebhookValidationResult> ValidateClient(WebhookClient client)
     {
         var validator = new WebhookClientValidator(client, new List<IValidationRule>

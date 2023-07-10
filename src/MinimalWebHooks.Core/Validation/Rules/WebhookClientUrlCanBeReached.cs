@@ -19,6 +19,6 @@ public class WebhookClientUrlCanBeReached : IValidationRule
         var canVerifyWebhookUrl = await _optionsProcessor.VerifyWebhookUrl(_client);
         return canVerifyWebhookUrl ? 
             new ValidationResult().Success("Client 'WebhookUrl' has been verified with a HEAD request or 'WebhookUrlIsReachable' has not been set.") : 
-            new ValidationResult().Failure("Cannot verifiy client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
+            new ValidationResult().Failure("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
     }
 }
