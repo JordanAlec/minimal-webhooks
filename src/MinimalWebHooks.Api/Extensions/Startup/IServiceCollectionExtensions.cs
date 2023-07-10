@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Builders;
 using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.Extensions;
@@ -18,7 +19,8 @@ public static class IServiceCollectionExtensions
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("WebhookClientPolicy", builtOptions.AuthPolicy);
+            var policy = builtOptions.AuthPolicy ?? new AuthorizationPolicyBuilder().RequireAssertion(context => true).Build();
+            options.AddPolicy(ApiConstants.Policy.WebhookPolicyName, policy);
         });
 
         services.AddMinimalWebhooksCore(dbContextOptions, webhookOptions);

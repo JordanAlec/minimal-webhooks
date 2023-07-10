@@ -24,11 +24,10 @@ namespace Api
             {
                 // This allows you to mark the endpoints as anonymous or you can create whatever policy you'd like to protect the GET / CREATE / DELETE webhook client endpoints.
 
-                // If you don't use Authentication add the below line to allow anonymous access
-                webhookApiOptions.SetAuthorizationPolicy(new AuthorizationPolicyBuilder().RequireAssertion(context => true).Build());
-
                 // To set a genuine policy like below make sure you 'AddAuthentication' to your IServiceCollection.
-                //webhookApiOptions.SetAuthorizationPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+                // webhookApiOptions.SetAuthorizationPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
+                // If you want to leave it anonymous then do not set the policy.
             },
             webhookOptions =>
             {

@@ -4,5 +4,5 @@ namespace MinimalWebHooks.Api.Models;
 
 public class WebhookApiOptions
 {
-    public AuthorizationPolicy AuthPolicy;
+    public AuthorizationPolicy? AuthPolicy;
 }
