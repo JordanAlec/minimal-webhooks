@@ -75,7 +75,7 @@ public class WebhookClientManager
         client.Disabled = command.SetDisabledFlag;
         if (command.HasHeaderReplacements())
         {
-            await _dataStore.Delete(client.ClientHeaders);
+            if (client.ClientHeaders != null) await _dataStore.Delete(client.ClientHeaders);
             client.ClientHeaders = command.ReplaceHeaders;
         }
         var updateResult = await _dataStore.Update(client);
