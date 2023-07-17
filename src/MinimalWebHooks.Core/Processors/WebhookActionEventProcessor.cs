@@ -1,4 +1,5 @@
 ﻿using System.Threading.Channels;
+using Microsoft.Extensions.Options;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 
@@ -8,13 +9,18 @@ public class WebhookActionEventProcessor : IWebhookActionEventProcessor
 {
     private readonly Channel<WebhookActionEvent> _webhookActionEventChannel;
 
-    public WebhookActionEventProcessor() => _webhookActionEventChannel = Channel.CreateBounded<WebhookActionEvent>(5);
-
-    public async Task<bool> WriteEvent(WebhookActionEvent webhookActionEvent)
+    public WebhookActionEventProcessor(WebhookOptions options)
     {
-        await _webhookActionEventChannel.Writer.WriteAsync(webhookActionEvent);
-        return _webhookActionEventChannel.Writer.TryComplete();
+        _webhookActionEventChannel = Channel.CreateBounded<WebhookActionEvent>(new BoundedChannelOptions(options.EventOptions!.QueueCapacity)
+        {
+            SingleWriter = true,
+            SingleReader = true,
+            FullMode = options.EventOptions!.FullMode
+        });
     }
+
+    public async Task WriteEvent(WebhookActionEvent webhookActionEvent) => 
+        await _webhookActionEventChannel.Writer.WriteAsync(webhookActionEvent);
 
     public bool HasEvents() => 
         _webhookActionEventChannel.Reader.CanCount && _webhookActionEventChannel.Reader.Count > 0;

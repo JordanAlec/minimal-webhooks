@@ -12,7 +12,6 @@ public class MockWebhookActionEventProcessorBuilder
     {
         _processor.Setup(x => x.HasEvents()).Returns(success);
         _processor.Setup(x => x.GetEvents()).ReturnsAsync(actionEvents);
-        _processor.Setup(x => x.WriteEvent(actionEvents.First())).ReturnsAsync(success);
         return this;
     }
 }

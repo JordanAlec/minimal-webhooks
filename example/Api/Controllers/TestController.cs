@@ -45,7 +45,7 @@ namespace Api.Controllers
             var clientCreationResult = await _clientsManager.Create(clientExample);
 
             // When you want to raise an 'Event' to send the webhook clients you write an event like below. This will only be sent to client that subscribe to the 'EntityTypeName' for 'Alert' and for 'Create' actions:
-            var writeEventResult = await _eventsManager.WriteEvent(new WebhookActionEvent().CreateEvent(alert, WebhookActionType.Create));
+            await _eventsManager.WriteEvent(new WebhookActionEvent().CreateEvent(alert, WebhookActionType.Create));
 
             // Once written events you can send events in bulk, like below
             // The event 'WebhookActionEvent' is only POST'ed to the webhook URL not the return value from 'WriteEvent'. If you want to find the client that sent the event, add a unique header to the client for identification.

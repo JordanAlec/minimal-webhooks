@@ -6,4 +6,5 @@ public class WebhookOptions
 {
     public bool VerifyWebhookUrl;
     public IWebhookActionEventSerialiser? EventSerialiser;
+    public WebhookEventOptions? EventOptions;
 }

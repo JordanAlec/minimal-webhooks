@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Extensions.Startup;
@@ -41,9 +42,15 @@ namespace Api
                 webhookOptions.WebhookUrlIsReachable();
 
                 // You can choose how you want to send data to the webhook URL. The 'IWebhookActionEventSerialiser' interface lets you define the media type and how Events are serialised.
+                // You can choose to omit the call if you want the defaults.
                 // The default behaviour is to use JSON and use System.Text.Json.JsonSerializer.Serialize();
                 // If you want to create your own create an object that implements the 'IWebhookActionEventSerialiser' interface. 
                 // webhookOptions.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser());
+
+                // You can choose the capacity options for events waiting to be sent to various webhook client urls.
+                // You can choose to omit the call if you want the defaults.
+                // the default behaviour has a capacity of 10, and will wait for space to be available if at capacity.
+                webhookOptions.SetEventOptions(1, BoundedChannelFullMode.Wait);
             });
 
             var app = builder.Build();

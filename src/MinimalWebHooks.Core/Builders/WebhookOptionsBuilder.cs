@@ -1,4 +1,5 @@
-﻿using MinimalWebHooks.Core.Interfaces;
+﻿using System.Threading.Channels;
+using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 
 namespace MinimalWebHooks.Core.Builders;
@@ -26,6 +27,16 @@ public class WebhookOptionsBuilder
     public WebhookOptionsBuilder SetWebhookActionEventSerialiser(IWebhookActionEventSerialiser eventSerialiser)
     {
         _options.EventSerialiser = eventSerialiser;
+        return this;
+    }
+
+    public WebhookOptionsBuilder SetEventOptions(int capacity, BoundedChannelFullMode? fullMode = null)
+    {
+        _options.EventOptions = new WebhookEventOptions
+        {
+            QueueCapacity = capacity,
+            FullMode = fullMode ?? BoundedChannelFullMode.Wait
+        };
         return this;
     }
 

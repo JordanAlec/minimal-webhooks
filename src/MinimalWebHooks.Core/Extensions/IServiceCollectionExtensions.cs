@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Channels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.DataStore;
@@ -19,6 +20,8 @@ public static class IServiceCollectionExtensions
         var builtOptions = webhookOptionsBuilder.Build();
         if (builtOptions.EventSerialiser == null) 
             builtOptions = webhookOptionsBuilder.SetWebhookActionEventSerialiser(new DefaultWebhookActionEventSerialiser()).Build();
+        if (builtOptions.EventOptions == null)
+            builtOptions = webhookOptionsBuilder.SetEventOptions(10).Build();
 
         services.AddSingleton(builtOptions);
         services.AddDbContext<MinimalWebhooksDbContext>(dbContextOptions);

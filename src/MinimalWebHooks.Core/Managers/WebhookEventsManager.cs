@@ -16,7 +16,7 @@ public class WebhookEventsManager
         _webhookHttpClient = webhookHttpClient;
     }
 
-    public async Task<bool> WriteEvent(WebhookActionEvent actionEvent) => await _eventProcessor.WriteEvent(actionEvent);
+    public async Task WriteEvent(WebhookActionEvent actionEvent) => await _eventProcessor.WriteEvent(actionEvent);
 
     public async Task<List<WebhookActionEventResult>> SendEvents()
     {

@@ -144,10 +144,7 @@ public class WebhookEventsManagerSpec
             EventsProcessor.VerifyNoOtherCalls();
         }
 
-        [Fact]
-        public void SuccessfullyWrittenEvent() => _success.Should().BeTrue();
-
-        public async Task InitializeAsync() => _success = await Manager.WriteEvent(WebhookActionEvent);
+        public async Task InitializeAsync() => await Manager.WriteEvent(WebhookActionEvent);
 
         public async Task DisposeAsync() => await Task.CompletedTask;
     }
