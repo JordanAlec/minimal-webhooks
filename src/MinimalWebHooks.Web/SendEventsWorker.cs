@@ -1,9 +1,9 @@
-﻿using MinimalWebHooks.Core.Managers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MinimalWebHooks.Api.Models;
+using MinimalWebHooks.Core.Managers;
+using MinimalWebHooks.Web.Models;
 
-namespace MinimalWebHooks.Api;
+namespace MinimalWebHooks.Web;
 
 public class SendEventsWorker : BackgroundService
 {

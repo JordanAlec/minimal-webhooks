@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 using Microsoft.EntityFrameworkCore;
-using MinimalWebHooks.Api.Extensions.Startup;
+using MinimalWebHooks.Web.Extensions.Startup;
 
 namespace Api
 {

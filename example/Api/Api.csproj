@@ -12,12 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MinimalWebHooks.Api\MinimalWebHooks.Api.csproj" />
+    <Folder Include="Models\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Data\" />
+    <ProjectReference Include="..\..\src\MinimalWebHooks.Web\MinimalWebHooks.Web.csproj" />
   </ItemGroup>
 
 </Project>

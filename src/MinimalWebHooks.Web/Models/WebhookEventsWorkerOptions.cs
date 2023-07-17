@@ -1,4 +1,4 @@
-﻿namespace MinimalWebHooks.Api.Models;
+﻿namespace MinimalWebHooks.Web.Models;
 
 public class WebhookEventsWorkerOptions
 {

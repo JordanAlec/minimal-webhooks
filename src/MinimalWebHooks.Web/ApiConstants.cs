@@ -1,4 +1,4 @@
-﻿namespace MinimalWebHooks.Api;
+﻿namespace MinimalWebHooks.Web;
 
 public class ApiConstants
 {

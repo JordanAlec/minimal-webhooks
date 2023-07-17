@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using MinimalWebHooks.Api.Extensions.Routes;
+using MinimalWebHooks.Web.Extensions.Routes;
 
-namespace MinimalWebHooks.Api.Extensions.Startup;
+namespace MinimalWebHooks.Web.Extensions.Startup;
 
 public static class WebApplicationExtensions
 {

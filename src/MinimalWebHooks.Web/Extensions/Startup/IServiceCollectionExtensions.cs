@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MinimalWebHooks.Api.Builders;
-using MinimalWebHooks.Api.Models;
 using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.Extensions;
+using MinimalWebHooks.Web.Builders;
+using MinimalWebHooks.Web.Models;
 
-namespace MinimalWebHooks.Api.Extensions.Startup;
+namespace MinimalWebHooks.Web.Extensions.Startup;
 
 public static class IServiceCollectionExtensions
 {

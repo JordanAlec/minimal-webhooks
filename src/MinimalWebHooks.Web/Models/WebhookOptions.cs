@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace MinimalWebHooks.Api.Models;
+namespace MinimalWebHooks.Web.Models;
 
 public class WebhookApiOptions
 {

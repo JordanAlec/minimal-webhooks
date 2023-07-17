@@ -7,7 +7,7 @@ using MinimalWebHooks.Core.Managers;
 using MinimalWebHooks.Core.Models;
 using MinimalWebHooks.Core.Models.DbSets;
 
-namespace MinimalWebHooks.Api.Extensions.Routes;
+namespace MinimalWebHooks.Web.Extensions.Routes;
 
 internal static class IEndpointRouteBuilderExtensions
 {
