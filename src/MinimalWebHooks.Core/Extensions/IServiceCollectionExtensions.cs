@@ -25,7 +25,7 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IWebhookClientHttpClient, WebhookClientHttpClient>();
         services.AddTransient<IWebhookDataStore, WebhookDataStore>();
         services.AddTransient<IWebhookOptionsProcessor, WebhookOptionsProcessor>();
-        services.AddTransient<IWebhookActionEventProcessor, WebhookActionEventProcessor>();
+        services.AddSingleton<IWebhookActionEventProcessor, WebhookActionEventProcessor>();
         services.AddTransient<WebhookClientManager>();
         services.AddTransient<WebhookEventsManager>();
         return services;

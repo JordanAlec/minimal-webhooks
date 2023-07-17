@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Builders;
+using MinimalWebHooks.Api.Models;
 using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.Extensions;
 
@@ -24,9 +25,17 @@ public static class IServiceCollectionExtensions
         });
 
         services.AddEndpointsApiExplorer();
-
-
         services.AddMinimalWebhooksCore(dbContextOptions, webhookOptions);
+        return services.AddMinimalWebhooksWorker(builtOptions);
+    }
+
+    private static IServiceCollection AddMinimalWebhooksWorker(this IServiceCollection services, WebhookApiOptions options)
+    {
+        if (options.WorkerOptions is not {EnableWorker: true}) return services;
+
+        services.AddSingleton(options.WorkerOptions);
+        services.AddHostedService<SendEventsWorker>();
+
         return services;
     }
 }
