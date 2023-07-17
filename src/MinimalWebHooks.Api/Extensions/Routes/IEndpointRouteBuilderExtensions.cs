@@ -42,4 +42,7 @@ internal static class IEndpointRouteBuilderExtensions
 
         return routerBuilder;
     }
+
+    // This is needed due to the downgrade to .NET 6 (until .NET 8)
+    internal static RouteHandlerBuilder MapPatch(this IEndpointRouteBuilder endpoints, string pattern, Delegate handler) => endpoints.MapMethods(pattern, new[] { "PATCH" }, handler);
 }

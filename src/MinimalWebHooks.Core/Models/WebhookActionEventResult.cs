@@ -1,5 +1,4 @@
 ﻿using MinimalWebHooks.Core.Models.DbSets;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MinimalWebHooks.Core.Models;
 
