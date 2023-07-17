@@ -1,8 +1,6 @@
 using System.Threading.Channels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Api.Extensions.Startup;
-using MinimalWebHooks.Core.Serialisation;
 
 namespace Api
 {

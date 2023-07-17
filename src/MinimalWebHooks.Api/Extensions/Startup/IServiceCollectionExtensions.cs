@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MinimalWebHooks.Api.Builders;
 using MinimalWebHooks.Api.Models;
 using MinimalWebHooks.Core.Builders;
@@ -18,8 +18,6 @@ public static class IServiceCollectionExtensions
 
         services.AddAuthorization(options =>
         {
-            var a = services.Any(x => x.ServiceType == typeof(IAuthenticationService));
-            var b = services.Any(x => x.ServiceType == typeof(IAuthenticationSchemeProvider));
             var policy = builtOptions.AuthPolicy ?? new AuthorizationPolicyBuilder().RequireAssertion(context => true).Build();
             options.AddPolicy(ApiConstants.Policy.WebhookPolicyName, policy);
         });

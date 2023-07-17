@@ -1,4 +1,5 @@
-﻿using MinimalWebHooks.Api.Extensions.Routes;
+﻿using Microsoft.AspNetCore.Builder;
+using MinimalWebHooks.Api.Extensions.Routes;
 
 namespace MinimalWebHooks.Api.Extensions.Startup;
 

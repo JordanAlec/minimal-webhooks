@@ -1,5 +1,4 @@
 ﻿using System.Threading.Channels;
-using Microsoft.Extensions.Options;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 

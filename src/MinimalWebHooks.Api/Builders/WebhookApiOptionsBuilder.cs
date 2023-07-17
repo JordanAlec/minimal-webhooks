@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using MinimalWebHooks.Api.Models;
-using MinimalWebHooks.Core.Interfaces;
-using MinimalWebHooks.Core.Models;
 
 namespace MinimalWebHooks.Api.Builders;
 

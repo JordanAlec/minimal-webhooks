@@ -1,6 +1,4 @@
-﻿using MinimalWebHooks.Core.Processors;
-
-namespace MinimalWebHooks.Tests.Base;
+﻿namespace MinimalWebHooks.Tests.Base;
 
 public class WebhookClientManagerBaseSpec
 {

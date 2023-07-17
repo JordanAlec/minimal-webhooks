@@ -1,7 +1,7 @@
 ﻿using MinimalWebHooks.Core.Managers;
-using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MinimalWebHooks.Api.Models;
-using MinimalWebHooks.Core.Models;
 
 namespace MinimalWebHooks.Api;
 

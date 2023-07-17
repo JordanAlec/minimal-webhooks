@@ -1,5 +1,4 @@
-﻿using System.Threading.Channels;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalWebHooks.Core.Builders;
 using MinimalWebHooks.Core.DataStore;
