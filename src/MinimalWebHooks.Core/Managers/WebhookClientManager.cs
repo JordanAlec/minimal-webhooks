@@ -10,12 +10,12 @@ namespace MinimalWebHooks.Core.Managers;
 public class WebhookClientManager
 {
     private readonly IWebhookDataStore _dataStore;
-    private readonly IWebhookOptionsProcessor _optionsProcessor;
+    private readonly IWebhookClientHttpClient _httpClient;
 
-    public WebhookClientManager(IWebhookDataStore dataStore, IWebhookOptionsProcessor optionsProcessor)
+    public WebhookClientManager(IWebhookDataStore dataStore, IWebhookClientHttpClient httpClient)
     {
         _dataStore = dataStore;
-        _optionsProcessor = optionsProcessor;
+        _httpClient = httpClient;
     }
 
     public async Task<WebhookDataResult> Get(int id)
@@ -90,7 +90,7 @@ public class WebhookClientManager
         var validator = new WebhookClientValidator(client, new List<IValidationRule>
         {
             new WebhookClientHasRequiredProps(client),
-            new WebhookClientUrlCanBeReached(client, _optionsProcessor)
+            new WebhookClientUrlCanBeReached(client, _httpClient)
         });
 
         return await validator.ValidateClient();

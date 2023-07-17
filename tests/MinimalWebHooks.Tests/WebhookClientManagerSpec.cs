@@ -10,7 +10,7 @@ namespace MinimalWebHooks.Tests
         {
             public CanGetClients() : base(
                 new MockWebhookDataStoreBuilder().SetupClients(FakeData.WebhookClients(1)),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -36,7 +36,7 @@ namespace MinimalWebHooks.Tests
             private static readonly List<WebhookClient> WebhookClients = FakeData.WebhookClients(1);
             public CanGetClientsByEntity() : base(
                 new MockWebhookDataStoreBuilder().SetupClients(WebhookClients).SetupClientsGetByEntity(WebhookClients),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -59,7 +59,7 @@ namespace MinimalWebHooks.Tests
 
         public class CannotFindClients : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
-            public CannotFindClients() : base(new MockWebhookDataStoreBuilder(), new MockWebhookOptionsProcessorBuilder())
+            public CannotFindClients() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -82,7 +82,7 @@ namespace MinimalWebHooks.Tests
 
         public class CannotFindClientsByEntity : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
-            public CannotFindClientsByEntity() : base(new MockWebhookDataStoreBuilder(), new MockWebhookOptionsProcessorBuilder())
+            public CannotFindClientsByEntity() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -108,7 +108,7 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CanGetClientById() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -133,7 +133,7 @@ namespace MinimalWebHooks.Tests
         {
             private static readonly int Id = 1;
 
-            public CannotFindClientById() : base(new MockWebhookDataStoreBuilder(), new MockWebhookOptionsProcessorBuilder())
+            public CannotFindClientById() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -159,7 +159,7 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CanSaveClient() : base(
                 new MockWebhookDataStoreBuilder().SetupCreateClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
             { }
 
             [Fact]
@@ -186,7 +186,7 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CannotSaveKnownClient() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client).SetupCreateClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
             { }
 
             [Fact]
@@ -212,11 +212,11 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CannotSaveClientWithNoVerifibleWebhookUrl() : base(
                 new MockWebhookDataStoreBuilder(),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, false))
-            { }
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, false))
+            { } 
 
             [Fact]
-            public void ClientWebhookUrlIsCheck() => OptionsProcessor.Verify(x => x.VerifyWebhookUrl(Client), Times.Once);
+            public void ClientWebhookUrlIsCheck() => HttpClient.Verify(x => x.VerifyWebhookUrl(Client), Times.Once);
 
             [Fact]
             public void DataStoreIsNotChecked() => DataStore.VerifyNoOtherCalls();
@@ -237,7 +237,7 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CanDisableClient() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client).SetupUpdateClient(Client),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -267,7 +267,7 @@ namespace MinimalWebHooks.Tests
             private static readonly WebhookClient Client = FakeData.WebhookClient();
             public CannotDisableClient() : base(
                 new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]
@@ -295,7 +295,7 @@ namespace MinimalWebHooks.Tests
 
             public CanUpdateClient() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
             { }
 
             [Fact]
@@ -334,7 +334,7 @@ namespace MinimalWebHooks.Tests
 
             public CanUpdateClientNoReplacementHeaders() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookOptionsProcessorBuilder().SetupVerifyWebhookUrl(Client, true))
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
             { }
 
             [Fact]
@@ -366,7 +366,7 @@ namespace MinimalWebHooks.Tests
 
             public CannotUpdateClient() : base(
                 new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
-                new MockWebhookOptionsProcessorBuilder())
+                new MockWebhookClientHttpClientBuilder())
             { }
 
             [Fact]

@@ -19,4 +19,10 @@ public class MockWebhookClientHttpClientBuilder
         _client.Setup(x => x.SendEventToWebhookUrl(webhookActionEvent, client)).ReturnsAsync(webhookActionEventResult);
         return this;
     }
+
+    public MockWebhookClientHttpClientBuilder SetupVerify(WebhookClient client, bool success)
+    {
+        _client.Setup(x => x.VerifyWebhookUrl(client)).ReturnsAsync(success);
+        return this;
+    }
 }

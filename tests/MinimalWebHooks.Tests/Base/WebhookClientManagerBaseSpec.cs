@@ -5,14 +5,14 @@ namespace MinimalWebHooks.Tests.Base;
 public class WebhookClientManagerBaseSpec
 {
     protected Mock<IWebhookDataStore> DataStore { get; set; }
-    protected Mock<IWebhookOptionsProcessor> OptionsProcessor { get; set; }
+    protected Mock<IWebhookClientHttpClient> HttpClient { get; set; }
     protected WebhookClientManager Manager { get; set; }
     protected WebhookDataResult Result { get; set; }
 
-    public WebhookClientManagerBaseSpec(MockWebhookDataStoreBuilder dataStoreBuilder, MockWebhookOptionsProcessorBuilder optionsBuilder)
+    public WebhookClientManagerBaseSpec(MockWebhookDataStoreBuilder dataStoreBuilder, MockWebhookClientHttpClientBuilder httpClientBuilder)
     {
         DataStore = dataStoreBuilder.Build();
-        OptionsProcessor = optionsBuilder.Build();
-        Manager = new WebhookClientManager(DataStore.Object, OptionsProcessor.Object);
+        HttpClient = httpClientBuilder.Build();
+        Manager = new WebhookClientManager(DataStore.Object, HttpClient.Object);
     }
 }

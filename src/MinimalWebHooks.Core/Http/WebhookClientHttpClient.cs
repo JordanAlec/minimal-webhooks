@@ -9,8 +9,10 @@ namespace MinimalWebHooks.Core.Http;
 public class WebhookClientHttpClient : IWebhookClientHttpClient
 {
     private readonly IWebhookActionEventSerialiser _eventSerialiser;
+    private readonly WebhookOptions _options;
     public WebhookClientHttpClient(WebhookOptions options)
     {
+        _options = options;
         _eventSerialiser = options.EventSerialiser ?? new DefaultWebhookActionEventSerialiser();
     }
 
@@ -35,6 +37,7 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
 
     public async Task<bool> VerifyWebhookUrl(WebhookClient client)
     {
+        if (!_options.VerifyWebhookUrl) return true;
         if (string.IsNullOrWhiteSpace(client.WebhookUrl)) return false;
         try
         {

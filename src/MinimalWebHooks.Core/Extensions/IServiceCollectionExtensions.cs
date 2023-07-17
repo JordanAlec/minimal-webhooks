@@ -22,9 +22,8 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton(builtOptions);
         services.AddDbContext<MinimalWebhooksDbContext>(dbContextOptions);
-        services.AddTransient<IWebhookClientHttpClient, WebhookClientHttpClient>();
         services.AddTransient<IWebhookDataStore, WebhookDataStore>();
-        services.AddTransient<IWebhookOptionsProcessor, WebhookOptionsProcessor>();
+        services.AddTransient<IWebhookClientHttpClient, WebhookClientHttpClient>();
         services.AddSingleton<IWebhookActionEventProcessor, WebhookActionEventProcessor>();
         services.AddTransient<WebhookClientManager>();
         services.AddTransient<WebhookEventsManager>();
