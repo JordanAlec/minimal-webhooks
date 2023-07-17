@@ -29,7 +29,7 @@ namespace Api
                 // If you want to leave it anonymous then do not set the policy.
 
                 // This will enable a worker that will automatically send events periodically. The value is in milliseconds. 1000 = 1 second.
-                webhookApiOptions.SetWorkerOptions(1000);
+                webhookApiOptions.SetWorkerOptions(30000);
 
                 // If you dont want the default of ten minutes you can call this instead.
                 // If you call both the last call will overwrite previous ones.

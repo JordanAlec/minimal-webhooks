@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Logging;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 using MinimalWebHooks.Core.Models.DbSets;
@@ -8,10 +9,12 @@ namespace MinimalWebHooks.Core.Http;
 
 public class WebhookClientHttpClient : IWebhookClientHttpClient
 {
+    private readonly ILogger<WebhookClientHttpClient> _logger;
     private readonly IWebhookActionEventSerialiser _eventSerialiser;
     private readonly WebhookOptions _options;
-    public WebhookClientHttpClient(WebhookOptions options)
+    public WebhookClientHttpClient(ILogger<WebhookClientHttpClient> logger, WebhookOptions options)
     {
+        _logger = logger;
         _options = options;
         _eventSerialiser = options.EventSerialiser ?? new DefaultWebhookActionEventSerialiser();
     }
@@ -48,10 +51,13 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
                 Method = HttpMethod.Head
             });
 
+            _logger.LogDebug("{logger}: Verifying client ({clientName}) webhook url: {url}. Success: {success}", nameof(WebhookClientHttpClient), client.Name, client.WebhookUrl, result.IsSuccessStatusCode);
+
             return result.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "{logger}: Error trying to verify webhook url ({clientName}): {url}", nameof(WebhookClientHttpClient), client.Name, client.WebhookUrl);
             return false;
         }
     }

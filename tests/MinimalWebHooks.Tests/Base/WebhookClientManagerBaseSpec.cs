@@ -1,4 +1,6 @@
-﻿namespace MinimalWebHooks.Tests.Base;
+﻿using Microsoft.Extensions.Logging;
+
+namespace MinimalWebHooks.Tests.Base;
 
 public class WebhookClientManagerBaseSpec
 {
@@ -11,6 +13,6 @@ public class WebhookClientManagerBaseSpec
     {
         DataStore = dataStoreBuilder.Build();
         HttpClient = httpClientBuilder.Build();
-        Manager = new WebhookClientManager(DataStore.Object, HttpClient.Object);
+        Manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, DataStore.Object, HttpClient.Object);
     }
 }

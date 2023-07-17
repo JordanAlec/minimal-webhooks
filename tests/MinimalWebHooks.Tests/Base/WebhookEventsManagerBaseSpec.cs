@@ -1,4 +1,6 @@
-﻿namespace MinimalWebHooks.Tests.Base;
+﻿using Microsoft.Extensions.Logging;
+
+namespace MinimalWebHooks.Tests.Base;
 
 public class WebhookEventsManagerBaseSpec
 {
@@ -13,6 +15,6 @@ public class WebhookEventsManagerBaseSpec
         DataStore = dataStoreBuilder.Build();
         WebhookHttpClient = httpClientBuilder.Build();
         EventsProcessor = eventProcessorBuilder.Build();
-        Manager = new WebhookEventsManager(DataStore.Object, EventsProcessor.Object, WebhookHttpClient.Object);
+        Manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, DataStore.Object, EventsProcessor.Object, WebhookHttpClient.Object);
     }
 }
