@@ -18,6 +18,7 @@ public class WebhookActionEvent
         EventTimestamp = DateTime.Now;
         Entity = data;
         EntityTypeName = data.GetEntityTypeName();
+
         return this;
     }
 }
