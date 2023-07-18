@@ -16,7 +16,7 @@ namespace Api
 
             builder.Services.AddMinimalWebhooksApi(dbContextOptions =>
             {
-                dbContextOptions.UseInMemoryDatabase("MinimalWebhooksDb");
+                dbContextOptions.UseSqlite("Data Source=MinimalWebhooks.db;", b => b.MigrationsAssembly("Api"));
                 dbContextOptions.EnableDetailedErrors();
                 dbContextOptions.EnableSensitiveDataLogging();
             },
