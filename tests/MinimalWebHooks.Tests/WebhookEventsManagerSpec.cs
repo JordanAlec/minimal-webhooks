@@ -127,13 +127,11 @@ public class WebhookEventsManagerSpec
     public class CanWriteEvents : WebhookEventsManagerBaseSpec, IAsyncLifetime
     {
         private static readonly WebhookActionEvent WebhookActionEvent =
-            new WebhookActionEvent().CreateEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
-
-        private bool _success;
+            FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
 
         public CanWriteEvents() : base(
             new MockWebhookDataStoreBuilder(),
-            new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent>{ WebhookActionEvent  }, true),
+            new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent>{ WebhookActionEvent }, true),
             new MockWebhookClientHttpClientBuilder())
         { }
 

@@ -9,8 +9,9 @@ public class WebhookActionEvent
     public DateTime EventTimestamp { get; private set; }
     public object? Entity { get; private set; }
     public string? EntityTypeName { get; private set; }
+    public string? Source { get; private set; }
 
-    public WebhookActionEvent CreateEvent<T>(T data, WebhookActionType actionType)
+    public async Task<WebhookActionEvent> CreateEvent<T>(T data, WebhookActionType actionType)
     {
         if (data == null) throw new ArgumentNullException(nameof(data), $"{nameof(WebhookActionEvent)} must be passed a generic type");
 
@@ -18,7 +19,10 @@ public class WebhookActionEvent
         EventTimestamp = DateTime.Now;
         Entity = data;
         EntityTypeName = data.GetEntityTypeName();
+        Source = await GetSource();
 
         return this;
     }
+
+    private async Task<string> GetSource(string serviceUrl = "https://api.ipify.org/") => await new HttpClient().GetStringAsync(new Uri(serviceUrl));
 }

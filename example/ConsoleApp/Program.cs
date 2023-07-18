@@ -23,7 +23,7 @@ namespace ConsoleApp
             var createClientResult = await clientManager.Create(new WebhookClient
                 {
                     Name = "Create Customer Client Example",
-                    WebhookUrl = "https://webhook.site/13043ffc-b84f-4746-9c7c-eb93e502582d",
+                    WebhookUrl = "",
                     EntityTypeName = "ConsoleApp.Models.Customer",
                     ActionType = WebhookActionType.Create,
                     ClientHeaders = null,
@@ -36,7 +36,7 @@ namespace ConsoleApp
 
             // We've created the customer in our DB, lets raise an 'event' that can be picked up later to send the creation update to our client's webhook url
             // We create a new event by creating a new 'WebhookActionEvent' object and call .CreateEvent, passing in the data you want to send and the CRUD action
-            await eventsManager.WriteEvent(new WebhookActionEvent().CreateEvent(newCustomer, WebhookActionType.Create));
+            await eventsManager.WriteEvent(await new WebhookActionEvent().CreateEvent(newCustomer, WebhookActionType.Create));
 
             // This will send all events on the queue, written from 'WriteEvents' above.
             var sendEventResults = await eventsManager.SendEvents();

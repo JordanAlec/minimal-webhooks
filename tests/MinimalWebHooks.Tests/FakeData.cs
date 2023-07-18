@@ -26,7 +26,8 @@ public static class FakeData
             .RuleFor(x => x.ActionType, f => actionType ?? f.PickRandom<WebhookActionType>())
             .RuleFor(x => x.EventTimestamp, f => f.Date.Recent())
             .RuleFor(x => x.Entity, data)
-            .RuleFor(x => x.EntityTypeName, data.GetEntityTypeName());
+            .RuleFor(x => x.EntityTypeName, data.GetEntityTypeName())
+            .RuleFor(x => x.Source, f => f.Internet.Ip());
 
     public static WebhookActionEvent WebhookActionEvent<T>(T data, WebhookActionType? actionType = null) => FakeWebhookActionEvent(data, actionType);
 

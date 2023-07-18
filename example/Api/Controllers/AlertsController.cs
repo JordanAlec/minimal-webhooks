@@ -35,7 +35,7 @@ namespace Api.Controllers
             var result = InMemoryAlerts.Alerts.TryAdd(alert.Id, alert);
             // If the alert was successfully created we'll create an event to say its created.
             // This will send the alert put a message on an internal queue ready to be sent by the worker (if enabled) or by yourself at a later date.
-            if (result) await _manager.WriteEvent(new WebhookActionEvent().CreateEvent(alert, WebhookActionType.Create));
+            if (result) await _manager.WriteEvent(await new WebhookActionEvent().CreateEvent(alert, WebhookActionType.Create));
             return result ? Ok(result) : BadRequest(new { status = $"Failed to create alert" });
         }
 
@@ -50,7 +50,7 @@ namespace Api.Controllers
             var result = InMemoryAlerts.Alerts.Remove(id);
             // If the alert was successfully deleted we'll create an event to say its deleted.
             // This will send the alert put a message on an internal queue ready to be sent by the worker (if enabled) or by yourself at a later date.
-            if (result) await _manager.WriteEvent(new WebhookActionEvent().CreateEvent(foundAlert, WebhookActionType.Delete));
+            if (result) await _manager.WriteEvent(await new WebhookActionEvent().CreateEvent(foundAlert, WebhookActionType.Delete));
             return result ? Ok(new { status = $"Successfully deleted alert" }) : BadRequest(new { status = $"Failed to delete alert" });
         }
     }
