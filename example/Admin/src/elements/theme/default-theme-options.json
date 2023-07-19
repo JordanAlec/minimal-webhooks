@@ -1,0 +1,34 @@
+{
+    "shared":{
+        "colours": {
+            "primary": {
+                "main": "#5f67a0",
+                "light": "#7F85B3",
+                "dark": "#596096"
+            },
+            "secondary": {
+                "main": "#A05F87",
+                "light": "#B37F9F",
+                "dark": "#94587D"
+            }
+        }
+    },
+    "header": {
+        "defaultAvatar": ""
+    },
+    "navigation": {
+        "drawerWidth": 256,
+        "drawerBackgroundColour": "#081627",
+        "navigationLinkBackgroundColour": "#101f33",
+        "navigationLinkDividerColour": "rgb(255,255,255,0.15)",
+        "nonLinkItemTextColour": "#fff",
+        "linkItemTextColour": "rgba(255, 255, 255, 0.7)",
+        "linkItemIconSelectedColour": "#4fc3f7",
+        "linkItemTextHoverFocusColour": "rgba(255, 255, 255, 0.08)"
+    },
+    "content": {
+        "maxWidth": 936,
+        "background": "#eaeff1"
+    }
+    
+}
