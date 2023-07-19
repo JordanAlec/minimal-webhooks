@@ -23,9 +23,9 @@ public class WebhookClientManager
         _httpClient = httpClient;
     }
 
-    public async Task<WebhookDataResult> Get(int id)
+    public async Task<WebhookDataResult> Get(int id, bool skipDisabledClients = true)
     {
-        var client =  await _dataStore.GetById(id);
+        var client =  await _dataStore.GetById(id, skipDisabledClients);
         var found = client != null;
         _logger.LogDebug("{logger}: Searching for client Id: {id}. Found: {found}", nameof(WebhookClientManager), id, found);
         return found

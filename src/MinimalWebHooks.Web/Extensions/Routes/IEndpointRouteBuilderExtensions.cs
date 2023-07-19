@@ -21,7 +21,7 @@ internal static class IEndpointRouteBuilderExtensions
 
         routerBuilder.MapGet("/webhooks/clients/{id}", [Authorize(ApiConstants.Policy.WebhookPolicyName)] async ([FromRoute]int id, [FromServices] WebhookClientManager manager) =>
         {
-            var client = await manager.Get(id);
+            var client = await manager.Get(id, false);
             return client.Success ? Results.Ok(client) : Results.BadRequest(client);
         }).WithName("getClient");
 
