@@ -20,6 +20,11 @@ export const navigationLinks = (): NavigationLinks[] => {
               id: 'Clients',
               url: '/clients',
               icon: <PeopleIcon />
+            },
+            {
+              id: 'Create',
+              url: '/clients/create',
+              icon: <PeopleIcon />
             }
           ]
         }
