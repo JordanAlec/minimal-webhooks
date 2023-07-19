@@ -20,7 +20,7 @@ public class WebhookDataStore : IWebhookDataStore
     }
 
     public async Task<WebhookClient?> GetByName(string name) =>
-        await _context.WebhookClients.Include(x => x.ClientHeaders).FirstOrDefaultAsync(w => w.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) && !w.Disabled);
+        await _context.WebhookClients.Include(x => x.ClientHeaders).FirstOrDefaultAsync(w => EF.Functions.Like(w.Name.ToLower(), name.ToLower()) && !w.Disabled);
 
     public async Task<List<WebhookClient>?> Get() =>
         await _context.WebhookClients.Where(w => !w.Disabled)
