@@ -10,7 +10,7 @@ type Props = {
     buttonText: string
 }
 
-const ActionButton = ({buttonColor, action, buttonText}: Props) => {
+const CallApiButton = ({buttonColor, action, buttonText}: Props) => {
   const router = useRouter();
 
   const handleOnClick = async () => {
@@ -29,4 +29,4 @@ const ActionButton = ({buttonColor, action, buttonText}: Props) => {
 }
 
 
-export default ActionButton;
+export default CallApiButton;

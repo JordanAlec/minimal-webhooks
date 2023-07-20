@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import ActionButton from '@/elements/components/action-button';
+import CallApiButton from '@/elements/components/call-api-button';
 
 type Props = {
     id: number
@@ -8,7 +8,7 @@ type Props = {
 
 const DisableClient = ({id}: Props) => {
   return (
-    <ActionButton buttonColor='error' action={async () => await axios.delete(`/api/clients/disable/${id}`)} buttonText='Disable'/>
+    <CallApiButton buttonColor='error' action={async () => await axios.delete(`/api/clients/disable/${id}`)} buttonText='Disable'/>
   )
 }
 

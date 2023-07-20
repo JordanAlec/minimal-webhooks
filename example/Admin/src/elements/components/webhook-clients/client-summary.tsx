@@ -1,6 +1,4 @@
 import Error from '@/elements/components/error';
-import ClientHeadersTable
-  from '@/elements/components/webhook-clients/client-headers-table';
 import ClientSummaryDetails
   from '@/elements/components/webhook-clients/client-summary-details';
 import DisableClient
@@ -13,6 +11,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+
+import ClientHeadersTableElevated from './client-headers-table-elevated';
 
 type Props = {
     client: WebhookClient
@@ -36,10 +36,7 @@ const ClientSummary = ({client}: Props) => {
           </Paper>
         </Grid>
         <Grid item xs={5}>
-          <Paper elevation={1} sx={{padding: 0.5}}>
-            <Typography color='text.secondary' align="center" sx={{marginBottom: 2}}>Headers</Typography>
-            <ClientHeadersTable clientHeaders={client.clientHeaders} />
-          </Paper>
+          <ClientHeadersTableElevated titleHeader='Headers' clientHeaders={client.clientHeaders} />
         </Grid>
         <Grid item xs={12}>
           <Typography color='text.secondary' align="center" sx={{marginBottom: 2}}>Actions</Typography>
