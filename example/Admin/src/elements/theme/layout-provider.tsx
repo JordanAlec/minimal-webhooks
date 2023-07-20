@@ -8,12 +8,12 @@ type Props = {
     children: ReactElement;
 }
 
-const LayoutProvider = (props: Props) => { 
+const LayoutProvider = ({appName, currentPage, children}: Props) => { 
 
     return (
-        <Layout appName={props.appName} 
-            currentPage={props.currentPage} 
-            contentChildren={props.children}
+        <Layout appName={appName} 
+            currentPage={currentPage} 
+            contentChildren={children}
         />
     );
 }  

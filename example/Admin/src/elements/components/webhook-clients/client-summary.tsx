@@ -18,8 +18,7 @@ type Props = {
     client: WebhookClient
 }
 
-const ClientSummary = (props: Props) => {
-  const client = props.client;
+const ClientSummary = ({client}: Props) => {
   const clientDisabledWarning = client.disabled ? <Error title="Client Disabled" bodyText="" /> : <></>;
 
 

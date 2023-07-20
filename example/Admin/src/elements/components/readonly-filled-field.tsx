@@ -6,9 +6,9 @@ type Props = {
     value?: unknown
 }
 
-const ReadOnlyFilledField = (props: Props) => {
+const ReadOnlyFilledField = ({id, label, value}: Props) => {
   return (
-    <TextField variant="filled" sx={{marginTop: 1}} fullWidth id={props.id} label={props.label} defaultValue={props.value} InputProps={{readOnly: true,}} />
+    <TextField variant="filled" sx={{marginTop: 1}} fullWidth id={id} label={label} defaultValue={value} InputProps={{readOnly: true,}} />
   )
 }
 

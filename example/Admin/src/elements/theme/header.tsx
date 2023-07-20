@@ -2,12 +2,14 @@ import { Fragment } from 'react';
 
 import defaultThemeOptions from '@/elements/theme/default-theme-options.json';
 import MenuIcon from '@mui/icons-material/Menu';
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import {
+  AppBar,
+  Avatar,
+  Grid,
+  IconButton,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 
 type Props = {
   onDrawerToggle: () => void;

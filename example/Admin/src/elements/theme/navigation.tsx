@@ -2,14 +2,17 @@ import Link from 'next/link';
 
 import defaultThemeOptions from '@/elements/theme/default-theme-options.json';
 import { NavigationLinks } from '@/types/elements/navigation-links';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Drawer, { DrawerProps } from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import {
+  Box,
+  Divider,
+  Drawer,
+  DrawerProps,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 
 type Props = {
   drawerProps: DrawerProps;
@@ -18,7 +21,7 @@ type Props = {
   currentPage: string;
 }
 
-const Navigation = (props: Props) => {
+const Navigation = ({drawerProps, appName, navigationLinks, currentPage}: Props) => {
 
   const mavigationItemDefaultSx = {
     py: '2px',
@@ -36,19 +39,19 @@ const Navigation = (props: Props) => {
   }
 
   return (
-    <Drawer variant='permanent' {...props.drawerProps}>
+    <Drawer variant='permanent' {...drawerProps}>
       <List disablePadding>
         <ListItem sx={{ ...mavigationItemDefaultSx, ...navigationHeaderDefaultSx, fontSize: 22, color: defaultThemeOptions.navigation.nonLinkItemTextColour }}>
-          {props.appName}
+          {appName}
         </ListItem>
-        {props.navigationLinks.map(({ id, children }) => (
+        {navigationLinks.map(({ id, children }) => (
           <Box key={id} sx={{ bgcolor: defaultThemeOptions.navigation.navigationLinkBackgroundColour }}>
             <ListItem sx={{ py: 2, px: 3 }}>
               <ListItemText sx={{ color: defaultThemeOptions.navigation.linkItemTextColour }}>{id}</ListItemText>
             </ListItem>
             {children.map(({ id: childId, url, icon }) => (
               <ListItem disablePadding key={childId}>
-                <ListItemButton selected={childId == props.currentPage} sx={mavigationItemDefaultSx}>
+                <ListItemButton selected={childId == currentPage} sx={mavigationItemDefaultSx}>
                   <ListItemIcon>{icon}</ListItemIcon>
                   <ListItemText><Link href={url} style={{textDecoration: 'none', color: defaultThemeOptions.navigation.linkItemTextColour}}>{childId}</Link></ListItemText>
                 </ListItemButton>

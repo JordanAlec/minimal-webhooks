@@ -7,8 +7,7 @@ type Props = {
     client: WebhookClient
 }
 
-const ClientSummaryDetails = (props: Props) => {
-  const client = props.client;
+const ClientSummaryDetails = ({client}: Props) => {
   return (
     <Box component="form" noValidate autoComplete="off">
          <ReadOnlyFilledField id={"client-id"} label={"Id"} value={client.id} />

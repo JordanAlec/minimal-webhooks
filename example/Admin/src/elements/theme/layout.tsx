@@ -12,7 +12,7 @@ import {
   baseThemeOptions,
   createThemeOnBaseTheme,
 } from '@/elements/theme/theme-options-builder';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
   createTheme,
@@ -26,7 +26,7 @@ type Props = {
   contentChildren: ReactNode;
 }
 
-const Layout = (props: Props) => {
+const Layout = ({appName, currentPage, contentChildren}: Props) => {
   const theme = createTheme(baseThemeOptions);
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -54,9 +54,9 @@ const Layout = (props: Props) => {
                 open: mobileOpen,
                 onClose: handleDrawerToggle
               }}
-              appName={props.appName}
+              appName={appName}
               navigationLinks={navigationLinks()}
-              currentPage={props.currentPage}
+              currentPage={currentPage}
             />
           )}
           <Navigation
@@ -68,15 +68,15 @@ const Layout = (props: Props) => {
                 display: { sm: 'block', xs: 'none' }
               }
             }}
-            appName={props.appName}
+            appName={appName}
             navigationLinks={navigationLinks()}
-            currentPage={props.currentPage}
+            currentPage={currentPage}
           />
         </Box>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Header onDrawerToggle={handleDrawerToggle} currentPage={props.currentPage} />
+          <Header onDrawerToggle={handleDrawerToggle} currentPage={currentPage} />
           <Box component='main' sx={{ flex: 1, py: 6, px: 4, bgcolor: defaultThemeOptions.content.background }}>
-            <Content contentChildren={props.contentChildren} />
+            <Content contentChildren={contentChildren} />
           </Box>
         </Box>
       </Box>

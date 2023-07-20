@@ -1,28 +1,14 @@
 import axios from 'axios';
-import { useRouter } from 'next/router';
 
-import log from '@/utils/log';
-import { Button } from '@mui/material';
+import ActionButton from '@/elements/components/action-button';
 
 type Props = {
     id: number
 }
 
-const EnableClient = (props: Props) => {
-  const router = useRouter();
-
-  const handleOnClick = async () => {
-    try {
-        const response = await axios.patch(`/api/clients/enable/${props.id}`);
-        if (response.status === 200) router.reload();
-    }
-    catch (e: Error | any) {
-        log.error(JSON.stringify(e));
-    }
-  };
-
+const EnableClient = ({id}: Props) => {
   return (
-    <Button variant="contained" color="primary" onClick={handleOnClick}>Enable</Button>
+    <ActionButton buttonColor='primary' action={async () => await axios.patch(`/api/clients/enable/${id}`)} buttonText='Enable'/>
   )
 }
 

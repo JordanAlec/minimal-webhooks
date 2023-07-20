@@ -13,13 +13,13 @@ type Props = {
     children: ReactNode;
 }
 
-const DataLoader = (props: Props) => {
+const DataLoader = ({error, isLoading, children}: Props) => {
 
   const element = useMemo(() => {
-    if (props.isLoading) return <Box sx={{ my: 5, mx: 2}}><Loading /></Box>
-    if (props.error) return <Box sx={{ my: 5, mx: 2}}><Error title={'Data fetch'} bodyText={props.error.message} /></Box>
-    return props.children
-  },[props.children, props.error, props.isLoading]);
+    if (isLoading) return <Box sx={{ my: 5, mx: 2}}><Loading /></Box>
+    if (error) return <Box sx={{ my: 5, mx: 2}}><Error title={'Data fetch'} bodyText={error.message} /></Box>
+    return children
+  },[children, error, isLoading]);
 
   return element;
 }

@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
  const id = req.query.id;
 
- if (!id) {
+ if (!id || id === "0") {
     res.status(400).end();
     return;
   }
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(response.status).json(response.data);
  }
  catch (e: Error | any) {
-  log.error(JSON.stringify(e));
-  return res.status(500).json({status: 'error', message: e.message});
+  log.error(JSON.stringify(e.response.data));
+  return res.status(500).json({status: 'error', message: e.response.data.message});
  }
 }
