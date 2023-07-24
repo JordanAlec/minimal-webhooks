@@ -290,7 +290,7 @@ namespace MinimalWebHooks.Tests
         public class CanUpdateClient : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, new Dictionary<string, string>{{ "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" }});
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string>{{ "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" }});
 
             public CanUpdateClient() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
@@ -301,7 +301,7 @@ namespace MinimalWebHooks.Tests
             public void DataStoreCanGetAndUpdateClient()
             {
                 DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
-                DataStore.Verify(x => x.Delete(Client.ClientHeaders), Times.Once);
+                DataStore.Verify(x => x.Delete(Client.ClientHeaders!), Times.Once);
                 DataStore.Verify(x => x.Update(Client), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
@@ -319,6 +319,7 @@ namespace MinimalWebHooks.Tests
                 Result.Data.First().ClientHeaders?.Should().HaveCount(1);
                 Result.Data.First().ClientHeaders?.First().Key.Should().Be("Authorization");
                 Result.Data.First().ClientHeaders?.First().Value.Should().Be("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
+                Result.Data.First().WebhookUrl.Should().Be(Client.WebhookUrl);
             }
 
             public async Task InitializeAsync() => Result = await Manager.Update(Command);
@@ -329,7 +330,7 @@ namespace MinimalWebHooks.Tests
         public class CanUpdateClientNoReplacementHeaders : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true);
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false);
 
             public CanUpdateClientNoReplacementHeaders() : base(
                 new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
@@ -358,12 +359,45 @@ namespace MinimalWebHooks.Tests
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotUpdateClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanUpdateClientDeleteHeaders : WebhookClientManagerBaseSpec, IAsyncLifetime
         {
             private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, true);
 
-            public CannotUpdateClient() : base(
+            public CanUpdateClientDeleteHeaders() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndUpdateClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.Verify(x => x.Delete(Client.ClientHeaders!), Times.Once);
+                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+
+            [Fact]
+            public void ClientUpdated() => Result.Data.First().Disabled.Should().BeTrue();
+
+            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CannotUpdateClientNotFound : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+
+            public CannotUpdateClientNotFound() : base(
                 new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
                 new MockWebhookClientHttpClientBuilder())
             { }
@@ -376,10 +410,38 @@ namespace MinimalWebHooks.Tests
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
 
             [Fact]
             public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
+
+            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+
+        public class CannotUpdateClientInvalidUrl : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, false, false);
+
+            public CannotUpdateClientInvalidUrl() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
+                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, false))
+            { }
+
+            [Fact]
+            public void DataStoreCanGetAndUpdateClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
 
             public async Task InitializeAsync() => Result = await Manager.Update(Command);
 

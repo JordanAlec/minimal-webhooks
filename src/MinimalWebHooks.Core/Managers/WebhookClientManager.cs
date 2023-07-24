@@ -7,6 +7,8 @@ using MinimalWebHooks.Core.Validation;
 using MinimalWebHooks.Core.Validation.Rules;
 using System;
 using MinimalWebHooks.Core.Extensions;
+using MinimalWebHooks.Core.Strategies;
+using MinimalWebHooks.Core.Strategies.Updates;
 
 namespace MinimalWebHooks.Core.Managers;
 
@@ -102,12 +104,24 @@ public class WebhookClientManager
             _logger.LogInformation("{logger}: Failed to update client. Client Id not found: {id}", nameof(WebhookClientManager), command.Id);
             return new WebhookDataResult().FailedResult($"Client not found with Id: {command.Id}.");
         }
-        client.Disabled = command.SetDisabledFlag;
-        if (command.HasHeaderReplacements())
+
+        var updateProcessor = new UpdateWebhookProcessor(new List<IUpdateStrategy>
         {
-            if (client.ClientHeaders != null) await _dataStore.Delete(client.ClientHeaders);
-            client.ClientHeaders = command.ReplaceHeaders;
+            new UpdateDisabledFlag(command, client),
+            new ReplaceHeaders(command, client, _dataStore),
+            new RemoveAllHeaders(command, client, _dataStore),
+            new UpdateWebhookUrl(command, client, _httpClient)
+        });
+
+        await updateProcessor.Update();
+
+        if (updateProcessor.HasFailures())
+        {
+            _logger.LogInformation("{logger}: Failed to update client ({id}): {reason}", nameof(WebhookClientManager), command.Id, updateProcessor.GetMessage());
+            return new WebhookDataResult().FailedResult(updateProcessor.GetMessage());
         }
+
+
         var updateResult = await _dataStore.Update(client);
 
         _logger.LogInformation("{logger}: Updated client ({id}): {success}", nameof(WebhookClientManager), command.Id, updateResult);
