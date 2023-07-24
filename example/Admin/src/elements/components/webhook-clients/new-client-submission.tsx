@@ -15,6 +15,10 @@ import ClientHeadersTableElevated
   from '@/elements/components/webhook-clients/client-headers-table-elevated';
 import { WebhookClient } from '@/types/webhooks/webhook-client';
 import {
+  addHeaderToClient,
+  removeHeaderFromClient,
+} from '@/utils/webhook-client-helper';
+import {
   Button,
   FormControl,
   Grid,
@@ -136,7 +140,18 @@ const NewClientSubmission = () => {
                   <MenuItem value={2}>Delete</MenuItem>
                 </FormField>
 
-              <ClientHeadersTableElevated titleHeader='Headers added' clientHeaders={newClient.clientHeaders} additionalSx={{marginTop: 2}} />
+              <ClientHeadersTableElevated
+               titleHeader='Headers added' 
+               clientHeaders={newClient.clientHeaders} 
+               additionalSx={{marginTop: 2}}
+               removeHeader={(header) => {
+                setNewClient((currentFormData) => {
+                  removeHeaderFromClient(currentFormData, header);
+                  return {
+                    ...currentFormData
+                  };
+                });
+              }} />
 
               <Button sx={{marginTop: 1}} variant="contained" color="primary" type="submit">Submit</Button>
               </FormControl>
@@ -146,8 +161,7 @@ const NewClientSubmission = () => {
       <Grid item xs={4}>
         <AddClientHeaders addedHeader={(header) => {
           setNewClient((currentFormData) => {
-            currentFormData.clientHeaders = currentFormData.clientHeaders ? currentFormData.clientHeaders : [];
-            currentFormData.clientHeaders?.push(header);
+            addHeaderToClient(currentFormData, header);
             return {
               ...currentFormData
             };
