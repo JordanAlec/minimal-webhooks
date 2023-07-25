@@ -15,7 +15,7 @@ public class WebhookClientActivityLog
     {
         LogType = type;
         Log = log;
-        TimeStamp = DateTime.Now.ToUniversalTime();
+        TimeStamp = DateTime.Now;
         return this;
     }
 
@@ -24,6 +24,7 @@ public class WebhookClientActivityLog
         var currentLogs = client.ActivityLogs;
         client.ActivityLogs = null;
         logAction(this);
+        TimeStamp = DateTime.Now;
         client.ActivityLogs = currentLogs;
         return this;
     }
@@ -33,8 +34,7 @@ public class WebhookClientActivityLog
         return CreateWebhookLog(client, activityLog =>
         {
             activityLog.LogType = ActivityLogType.CreatedClient;
-            activityLog.Log = "Created Client";
-            activityLog.TimeStamp = DateTime.Now.ToUniversalTime();
+            activityLog.Log = $"Created Client: {JsonSerializer.Serialize(client)}";
         });
     }
 
@@ -44,17 +44,16 @@ public class WebhookClientActivityLog
         {
             activityLog.LogType = ActivityLogType.UpdatedClient;
             activityLog.Log = $"Created Updated: {JsonSerializer.Serialize(client)}";
-            activityLog.TimeStamp = DateTime.Now.ToUniversalTime();
         });
     }
 
     public WebhookClientActivityLog CreateWebhookCallLog(WebhookClient client, int statusCode, string? message)
     {
+        var logMessage = string.IsNullOrWhiteSpace(message) ? "No response message" : message;
         return CreateWebhookLog(client, activityLog =>
         {
             activityLog.LogType = ActivityLogType.CalledWebhookUrl;
-            activityLog.Log = $"Client called Url: {JsonSerializer.Serialize(client)}. Status code returned: {statusCode}. Message: {message}";
-            activityLog.TimeStamp = DateTime.Now.ToUniversalTime();
+            activityLog.Log = $"Client called Url: {client.WebhookUrl}. Status code returned: {statusCode}. Message: {logMessage}";
         });
     }
 
