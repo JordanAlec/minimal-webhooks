@@ -29,7 +29,7 @@ public class WebhookDataStore : IWebhookDataStore
 
     public async Task<List<WebhookClient>?> GetByEntity<T>(T data, WebhookActionType actionType) =>
         await _context.WebhookClients
-            .Where(x => x.EntityTypeName.Equals(data.GetEntityTypeName(), StringComparison.InvariantCultureIgnoreCase))
+            .Where(x => EF.Functions.Like(x.EntityTypeName.ToLower(), data.GetEntityTypeName().ToLower()))
             .Where(x => x.ActionType == actionType)
             .Where(x => !x.Disabled)
             .Include(x => x.ClientHeaders)
