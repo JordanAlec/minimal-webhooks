@@ -9,6 +9,7 @@ using System;
 using MinimalWebHooks.Core.Extensions;
 using MinimalWebHooks.Core.Strategies;
 using MinimalWebHooks.Core.Strategies.Updates;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MinimalWebHooks.Core.Managers;
 
@@ -72,6 +73,7 @@ public class WebhookClientManager
         }
         var savedClient = await _dataStore.Create(client);
         var saved = savedClient != null;
+        if (saved) await AddLogToClient(savedClient.Id, new WebhookClientActivityLog().CreateCreateLog(savedClient));
         _logger.LogInformation("{logger}: Created client ({name}): {success}", nameof(WebhookClientManager), client.Name, saved);
         return saved ? new WebhookDataResult().SuccessfulResult($"Successfully created client.", savedClient) : new WebhookDataResult().FailedResult($"Failed to created client.", client);
     }
@@ -86,6 +88,7 @@ public class WebhookClientManager
         }
         client.Disabled = true;
         var disableResult = await _dataStore.Update(client);
+        if (disableResult) await AddLogToClient(client.Id, new WebhookClientActivityLog().CreateUpdateLog(client));
         _logger.LogInformation("{logger}: Disabled client ({id}): {success}", nameof(WebhookClientManager), id, disableResult);
         return disableResult
             ? new WebhookDataResult().SuccessfulResult($"Client disabled with Id: {id}.", client)
@@ -123,12 +126,26 @@ public class WebhookClientManager
 
 
         var updateResult = await _dataStore.Update(client);
+        if (updateResult) await AddLogToClient(client.Id, new WebhookClientActivityLog().CreateUpdateLog(client));
 
         _logger.LogInformation("{logger}: Updated client ({id}): {success}", nameof(WebhookClientManager), command.Id, updateResult);
 
         return updateResult
             ? new WebhookDataResult().SuccessfulResult($"Client updated with Id: {command.Id}.", client)
             : new WebhookDataResult().FailedResult($"Client not updated with Id: {command.Id}.", client);
+    }
+
+    public async Task<WebhookDataResult> AddLogToClient(int id, WebhookClientActivityLog log)
+    {
+        var client = await _dataStore.GetById(id, false);
+        if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {id}.");
+        client.ActivityLogs ??= new List<WebhookClientActivityLog>();
+        client.ActivityLogs.Add(log);
+        var addedLog = await _dataStore.Update(client);
+        _logger.LogDebug("{logger}: Added log to client ({id}): {success}", nameof(WebhookClientManager), id, addedLog);
+        return addedLog
+            ? new WebhookDataResult().SuccessfulResult($"Log added to client with Id: {id}.", client)
+            : new WebhookDataResult().FailedResult($"Failed to add log to client with Id: {id}.");
     }
 
     private async Task<WebhookValidationResult> ValidateClient(WebhookClient client)

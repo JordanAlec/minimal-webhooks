@@ -7,6 +7,7 @@ namespace MinimalWebHooks.Core.DataStore
     {
         public DbSet<WebhookClient> WebhookClients { get; set; }
         public DbSet<WebhookClientHeader> WebhookClientHeaders { get; set; }
+        public DbSet<WebhookClientActivityLog> WebhookClientActivityLogs { get; set; }
 
         public MinimalWebhooksDbContext(DbContextOptions<MinimalWebhooksDbContext> options) : base(options)
         {}

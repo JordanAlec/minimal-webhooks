@@ -46,6 +46,32 @@ namespace Api.Migrations
                     b.ToTable("WebhookClients");
                 });
 
+            modelBuilder.Entity("MinimalWebHooks.Core.Models.DbSets.WebhookClientActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Log")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LogType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("WebhookClientId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebhookClientId");
+
+                    b.ToTable("WebhookClientActivityLogs");
+                });
+
             modelBuilder.Entity("MinimalWebHooks.Core.Models.DbSets.WebhookClientHeader", b =>
                 {
                     b.Property<int>("Id")
@@ -70,6 +96,13 @@ namespace Api.Migrations
                     b.ToTable("WebhookClientHeaders");
                 });
 
+            modelBuilder.Entity("MinimalWebHooks.Core.Models.DbSets.WebhookClientActivityLog", b =>
+                {
+                    b.HasOne("MinimalWebHooks.Core.Models.DbSets.WebhookClient", null)
+                        .WithMany("ActivityLogs")
+                        .HasForeignKey("WebhookClientId");
+                });
+
             modelBuilder.Entity("MinimalWebHooks.Core.Models.DbSets.WebhookClientHeader", b =>
                 {
                     b.HasOne("MinimalWebHooks.Core.Models.DbSets.WebhookClient", null)
@@ -79,6 +112,8 @@ namespace Api.Migrations
 
             modelBuilder.Entity("MinimalWebHooks.Core.Models.DbSets.WebhookClient", b =>
                 {
+                    b.Navigation("ActivityLogs");
+
                     b.Navigation("ClientHeaders");
                 });
 #pragma warning restore 612, 618

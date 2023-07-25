@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net;
+using Microsoft.Extensions.Logging;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
+using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Core.Managers;
 
@@ -43,11 +45,21 @@ public class WebhookEventsManager
             foreach (var webhookClient in webhookClients)
             {
                 var result = await _webhookHttpClient.SendEventToWebhookUrl(actionEvent, webhookClient);
+                await AddLogToClient(webhookClient, result);
                 _logger.LogInformation("{logger}: Sent event: {clientSuccess}. Client name: {clientName}", nameof(WebhookEventsManager), result.Success, result.WebhookClient.Name);
                 results.Add(result);
             }
         }
 
         return results;
+    }
+
+    public async Task<bool> AddLogToClient(WebhookClient client, WebhookActionEventResult actionEvent)
+    {
+        client.ActivityLogs ??= new List<WebhookClientActivityLog>();
+        client.ActivityLogs.Add(new WebhookClientActivityLog().CreateWebhookCallLog(client, actionEvent.StatusCode, actionEvent.Message));
+        var addedLog = await _dataStore.Update(client);
+        _logger.LogDebug("{logger}: Added log to client ({id}): {success}", nameof(WebhookEventsManager), client.Id, addedLog);
+        return addedLog;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -28,6 +29,27 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WebhookClientActivityLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    LogType = table.Column<int>(type: "INTEGER", nullable: false),
+                    Log = table.Column<string>(type: "TEXT", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    WebhookClientId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WebhookClientActivityLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WebhookClientActivityLogs_WebhookClients_WebhookClientId",
+                        column: x => x.WebhookClientId,
+                        principalTable: "WebhookClients",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WebhookClientHeaders",
                 columns: table => new
                 {
@@ -48,6 +70,11 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_WebhookClientActivityLogs_WebhookClientId",
+                table: "WebhookClientActivityLogs",
+                column: "WebhookClientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WebhookClientHeaders_WebhookClientId",
                 table: "WebhookClientHeaders",
                 column: "WebhookClientId");
@@ -56,6 +83,9 @@ namespace Api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "WebhookClientActivityLogs");
+
             migrationBuilder.DropTable(
                 name: "WebhookClientHeaders");
 

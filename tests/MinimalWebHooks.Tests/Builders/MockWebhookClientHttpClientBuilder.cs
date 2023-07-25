@@ -11,10 +11,11 @@ public class MockWebhookClientHttpClientBuilder
 
     public MockWebhookClientHttpClientBuilder Setup(WebhookActionEvent webhookActionEvent, WebhookClient client, bool success)
     {
+        var statusCode = success ? 200 : 500;
         _client.Setup(x => x.VerifyWebhookUrl(client)).ReturnsAsync(success);
         var webhookActionEventResult = success ? 
-            new WebhookActionEventResult().SuccessfulResult(webhookActionEvent, client) :
-            new WebhookActionEventResult().FailedResult(webhookActionEvent, client);
+            new WebhookActionEventResult().SuccessfulResult(webhookActionEvent, client, statusCode) :
+            new WebhookActionEventResult().FailedResult(webhookActionEvent, client, statusCode);
 
         _client.Setup(x => x.SendEventToWebhookUrl(webhookActionEvent, client)).ReturnsAsync(webhookActionEventResult);
         return this;

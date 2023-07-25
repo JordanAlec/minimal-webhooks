@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using MinimalWebHooks.Core.Enum;
 using MinimalWebHooks.Core.Models.DbSets;
 
@@ -164,7 +165,8 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndCreateClient()
             {
-                DataStore.Verify(x => x.GetByName(Client.Name), Times.Once);
+                DataStore.Verify(x => x.GetByName(Client.Name));
+                DataStore.Verify(x => x.GetById(Client.Id, false));
                 DataStore.Verify(x => x.Create(Client), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
@@ -242,7 +244,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndDisableClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, It.IsAny<bool>()));
                 DataStore.Verify(x => x.Update(Client), Times.Once);
                 DataStore.VerifyNoOtherCalls();
             }
@@ -287,22 +289,34 @@ namespace MinimalWebHooks.Tests
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanUpdateClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanUpdateClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string>{{ "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" }});
+            protected Mock<IWebhookDataStore> DataStore { get; set; }
+            protected Mock<IWebhookClientHttpClient> HttpClient { get; set; }
+            protected WebhookClientManager Manager { get; set; }
+            protected WebhookDataResult Result { get; set; }
 
-            public CanUpdateClient() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
-            { }
+            private WebhookClient Client;
+            private List<WebhookClientHeader>? OriginalHeaders;
+            private WebhookUpdateCommand Command;
+
+            public CanUpdateClient()
+            {
+                Client = FakeData.WebhookClient();
+                OriginalHeaders = Client.ClientHeaders;
+                Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+
+                DataStore = new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client).Build();
+                HttpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true).Build();
+                Manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, DataStore.Object, HttpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
-                DataStore.Verify(x => x.Delete(Client.ClientHeaders!), Times.Once);
-                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, false));
+                DataStore.Verify(x => x.Delete(OriginalHeaders!), Times.Once);
+                DataStore.Verify(x => x.Update(Client));
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -320,6 +334,7 @@ namespace MinimalWebHooks.Tests
                 Result.Data.First().ClientHeaders?.First().Key.Should().Be("Authorization");
                 Result.Data.First().ClientHeaders?.First().Value.Should().Be("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
                 Result.Data.First().WebhookUrl.Should().Be(Client.WebhookUrl);
+                OriginalHeaders.Should().NotBeEquivalentTo(Client.ClientHeaders);
             }
 
             public async Task InitializeAsync() => Result = await Manager.Update(Command);
@@ -340,8 +355,8 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
-                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, false));
+                DataStore.Verify(x => x.Update(Client));
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -372,9 +387,9 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
+                DataStore.Verify(x => x.GetById(Client.Id, false));
                 DataStore.Verify(x => x.Delete(Client.ClientHeaders!), Times.Once);
-                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.Verify(x => x.Update(Client));
                 DataStore.VerifyNoOtherCalls();
             }
 
@@ -444,6 +459,33 @@ namespace MinimalWebHooks.Tests
             public void ResultMessage() => Result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
 
             public async Task InitializeAsync() => Result = await Manager.Update(Command);
+
+            public async Task DisposeAsync() => await Task.CompletedTask;
+        }
+        
+        public class CanAddLogToClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        {
+            private static readonly WebhookClient Client = FakeData.WebhookClient();
+            public CanAddLogToClient() : base(
+                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
+                new MockWebhookClientHttpClientBuilder())
+            { }
+
+            [Fact]
+            public void DataStoreCanGetClient()
+            {
+                DataStore.Verify(x => x.GetById(Client.Id, false));
+                DataStore.Verify(x => x.Update(Client), Times.Once);
+                DataStore.VerifyNoOtherCalls();
+            }
+
+            [Fact]
+            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+
+            [Fact]
+            public void ResultMessage() => Result.Message.Should().Contain($"Log added to client with Id: {Client.Id}.");
+
+            public async Task InitializeAsync() => Result = await Manager.AddLogToClient(Client.Id, new WebhookClientActivityLog().CreateLog(ActivityLogType.CalledWebhookUrl, "Called Webhook Url"));
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }

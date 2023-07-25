@@ -16,6 +16,8 @@ public class WebhookClient
     public string EntityTypeName { get; set; }
     public bool Disabled { get; set; }
     public List<WebhookClientHeader>? ClientHeaders { get; set; }
+    public List<WebhookClientActivityLog>? ActivityLogs { get; set; }
 
     public bool HasHeaders() => ClientHeaders != null && ClientHeaders.Any();
+    public bool HasLogs() => ActivityLogs != null && ActivityLogs.Any();
 }

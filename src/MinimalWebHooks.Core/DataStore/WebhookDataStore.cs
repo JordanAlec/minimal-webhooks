@@ -16,7 +16,7 @@ public class WebhookDataStore : IWebhookDataStore
     {
         var clientsQueryable = _context.WebhookClients.AsQueryable().Where(x => x.Id == id);
         if (skipDisabledClients) clientsQueryable = clientsQueryable.Where(x => !x.Disabled).AsQueryable();
-        return await clientsQueryable.Include(x => x.ClientHeaders).FirstOrDefaultAsync();
+        return await clientsQueryable.Include(x => x.ClientHeaders).Include(x => x.ActivityLogs).FirstOrDefaultAsync();
     }
 
     public async Task<WebhookClient?> GetByName(string name) =>

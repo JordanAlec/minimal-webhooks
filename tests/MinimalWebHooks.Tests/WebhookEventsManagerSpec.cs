@@ -28,6 +28,7 @@ public class WebhookEventsManagerSpec
         public void DataStoreCanGetClientByEntity()
         {
             DataStore.Verify(x => x.GetByEntity<object>(WebhookClient, WebhookActionType.Create));
+            DataStore.Verify(x => x.Update(WebhookClient));
             DataStore.VerifyNoOtherCalls();
         }
 
@@ -69,6 +70,7 @@ public class WebhookEventsManagerSpec
         public void DataStoreCanGetClientByEntity()
         {
             DataStore.Verify(x => x.GetByEntity<object>(WebhookClient, WebhookActionType.Create));
+            DataStore.Verify(x => x.Update(WebhookClient));
             DataStore.VerifyNoOtherCalls();
         }
 

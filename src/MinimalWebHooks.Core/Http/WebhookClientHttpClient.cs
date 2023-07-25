@@ -29,12 +29,12 @@ public class WebhookClientHttpClient : IWebhookClientHttpClient
             var content = await response.Content.ReadAsStringAsync();
 
             return response.IsSuccessStatusCode ? 
-                new WebhookActionEventResult().SuccessfulResult(webhookActionEvent, webhookClient, content) : 
-                new WebhookActionEventResult().FailedResult(webhookActionEvent, webhookClient, content);
+                new WebhookActionEventResult().SuccessfulResult(webhookActionEvent, webhookClient, (int)response.StatusCode, content) : 
+                new WebhookActionEventResult().FailedResult(webhookActionEvent, webhookClient, (int)response.StatusCode, content);
         }
         catch (Exception ex)
         {
-            return new WebhookActionEventResult().FailedResult(webhookActionEvent, webhookClient, ex.Message);
+            return new WebhookActionEventResult().FailedResult(webhookActionEvent, webhookClient, 500, ex.Message);
         }
     }
 
