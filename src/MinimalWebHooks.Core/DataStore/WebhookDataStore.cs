@@ -12,11 +12,14 @@ public class WebhookDataStore : IWebhookDataStore
 
     public WebhookDataStore(MinimalWebhooksDbContext context) => _context = context;
 
-    public async Task<WebhookClient?> GetById(int id, bool skipDisabledClients = true)
+    public async Task<WebhookClient?> GetById(int id, bool skipDisabledClients = true, int includeLastNumOfLogsInMonths = 6)
     {
         var clientsQueryable = _context.WebhookClients.AsQueryable().Where(x => x.Id == id);
         if (skipDisabledClients) clientsQueryable = clientsQueryable.Where(x => !x.Disabled).AsQueryable();
-        return await clientsQueryable.Include(x => x.ClientHeaders).Include(x => x.ActivityLogs).FirstOrDefaultAsync();
+        return await clientsQueryable
+            .Include(x => x.ClientHeaders)
+            .Include(x => x.ActivityLogs.Where(x => x.TimeStamp > DateTime.Today.AddMonths(-includeLastNumOfLogsInMonths)))
+            .FirstOrDefaultAsync();
     }
 
     public async Task<WebhookClient?> GetByName(string name) =>

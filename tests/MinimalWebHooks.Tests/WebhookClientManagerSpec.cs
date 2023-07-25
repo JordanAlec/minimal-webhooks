@@ -153,7 +153,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, true), Times.Once);
+                _dataStore.Verify(x => x.GetById(_client.Id, true, 6), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
 
@@ -185,7 +185,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetClient()
             {
-                _dataStore.Verify(x => x.GetById(Id, true), Times.Once);
+                _dataStore.Verify(x => x.GetById(Id, true, 6), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
 
@@ -220,7 +220,7 @@ namespace MinimalWebHooks.Tests
             public void DataStoreCanGetAndCreateClient()
             {
                 _dataStore.Verify(x => x.GetByName(_client.Name));
-                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6));
                 _dataStore.Verify(x => x.Create(_client), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
@@ -323,7 +323,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndDisableClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, It.IsAny<bool>()));
+                _dataStore.Verify(x => x.GetById(_client.Id, It.IsAny<bool>(), 6));
                 _dataStore.Verify(x => x.Update(_client), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
@@ -361,7 +361,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetOnly()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, true), Times.Once);
+                _dataStore.Verify(x => x.GetById(_client.Id, true, 6), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
 
@@ -400,7 +400,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6));
                 _dataStore.Verify(x => x.Delete(_originalHeaders!), Times.Once);
                 _dataStore.Verify(x => x.Update(_client));
                 _dataStore.VerifyNoOtherCalls();
@@ -449,7 +449,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6));
                 _dataStore.Verify(x => x.Update(_client));
                 _dataStore.VerifyNoOtherCalls();
             }
@@ -489,7 +489,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6));
                 _dataStore.Verify(x => x.Delete(_client.ClientHeaders!), Times.Once);
                 _dataStore.Verify(x => x.Update(_client));
                 _dataStore.VerifyNoOtherCalls();
@@ -531,7 +531,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetOnly()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false), Times.Once);
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
 
@@ -568,7 +568,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false), Times.Once);
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }
 
@@ -601,7 +601,7 @@ namespace MinimalWebHooks.Tests
             [Fact]
             public void DataStoreCanGetClient()
             {
-                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.GetById(_client.Id, false, 6));
                 _dataStore.Verify(x => x.Update(_client), Times.Once);
                 _dataStore.VerifyNoOtherCalls();
             }

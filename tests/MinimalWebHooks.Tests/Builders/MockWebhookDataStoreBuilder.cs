@@ -25,9 +25,9 @@ public class MockWebhookDataStoreBuilder
         return this;
     }
 
-    public MockWebhookDataStoreBuilder SetupClient(WebhookClient client, bool skipDisabledClients = true)
+    public MockWebhookDataStoreBuilder SetupClient(WebhookClient client, bool skipDisabledClients = true, int includeLastNumOfLogsInMonths = 6)
     {
-        _dataStore.Setup(x => x.GetById(client.Id, skipDisabledClients))
+        _dataStore.Setup(x => x.GetById(client.Id, skipDisabledClients, includeLastNumOfLogsInMonths))
             .ReturnsAsync(client);
         _dataStore.Setup(x => x.GetByName(client.Name))
             .ReturnsAsync(client);
