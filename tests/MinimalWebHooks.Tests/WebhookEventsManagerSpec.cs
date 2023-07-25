@@ -1,150 +1,190 @@
-﻿using MinimalWebHooks.Core.Enum;
+﻿using Microsoft.Extensions.Logging;
+using MinimalWebHooks.Core.Enum;
 using MinimalWebHooks.Core.Models.DbSets;
 
 namespace MinimalWebHooks.Tests;
 
 public class WebhookEventsManagerSpec
 {
-    public class CanSendEvents : WebhookEventsManagerBaseSpec, IAsyncLifetime
+    public class CanSendEvents : IAsyncLifetime
     {
-        private static readonly WebhookClient WebhookClient = FakeData.WebhookClient(WebhookActionType.Create);
-        private static readonly WebhookActionEvent WebhookActionEvent = FakeData.WebhookActionEvent(WebhookClient, WebhookActionType.Create);
+        private readonly Mock<IWebhookDataStore> _dataStore;
+        private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly Mock<IWebhookClientHttpClient> _webhookHttpClient;
+        private readonly WebhookEventsManager _manager;
+        private List<WebhookActionEventResult> _eventResults;
 
-        public CanSendEvents() : base(
-            new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient>{ WebhookClient }).SetupClientsGetByEntity(new List<WebhookClient> { WebhookClient }),
-            new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent>{ WebhookActionEvent }, true), 
-            new MockWebhookClientHttpClientBuilder().Setup(WebhookActionEvent, WebhookClient, true))
-        {}
+        private readonly WebhookClient _webhookClient;
+        private readonly WebhookActionEvent _webhookActionEvent;
+
+        public CanSendEvents()
+        {
+            _webhookClient = FakeData.WebhookClient(WebhookActionType.Create);
+            _webhookActionEvent = FakeData.WebhookActionEvent(_webhookClient, WebhookActionType.Create);
+
+            _dataStore = new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient> { _webhookClient }).SetupClientsGetByEntity(new List<WebhookClient> { _webhookClient }).Build();
+            _webhookHttpClient = new MockWebhookClientHttpClientBuilder().Setup(_webhookActionEvent, _webhookClient, true).Build();
+            _eventsProcessor = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { _webhookActionEvent }, true).Build();
+            _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, _webhookHttpClient.Object);
+        }
 
         [Fact]
         public void EventsProcessorGetsEvents()
         {
-            EventsProcessor.Verify(x => x.HasEvents(), Times.Once);
-            EventsProcessor.Verify(x => x.GetEvents(), Times.Once);
-            EventsProcessor.VerifyNoOtherCalls();
+            _eventsProcessor.Verify(x => x.HasEvents(), Times.Once);
+            _eventsProcessor.Verify(x => x.GetEvents(), Times.Once);
+            _eventsProcessor.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void DataStoreCanGetClientByEntity()
         {
-            DataStore.Verify(x => x.GetByEntity<object>(WebhookClient, WebhookActionType.Create));
-            DataStore.Verify(x => x.Update(WebhookClient));
-            DataStore.VerifyNoOtherCalls();
+            _dataStore.Verify(x => x.GetByEntity<object>(_webhookClient, WebhookActionType.Create));
+            _dataStore.Verify(x => x.Update(_webhookClient));
+            _dataStore.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void HttpClientCallsWebhookUrl()
         {
-            WebhookHttpClient.Verify(x => x.SendEventToWebhookUrl(WebhookActionEvent, WebhookClient));
-            WebhookHttpClient.VerifyNoOtherCalls();
+            _webhookHttpClient.Verify(x => x.SendEventToWebhookUrl(_webhookActionEvent, _webhookClient));
+            _webhookHttpClient.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void EventResultsAllSuccessful() => EventResults.All(x => x.Success).Should().BeTrue();
+        public void EventResultsAllSuccessful() => _eventResults.All(x => x.Success).Should().BeTrue();
 
-        public async Task InitializeAsync() => EventResults = await Manager.SendEvents();
+        public async Task InitializeAsync() => _eventResults = await _manager.SendEvents();
 
         public async Task DisposeAsync() => await Task.CompletedTask;
     }
 
-    public class CanSendEventsFailureResponse : WebhookEventsManagerBaseSpec, IAsyncLifetime
+    public class CanSendEventsFailureResponse : IAsyncLifetime
     {
-        private static readonly WebhookClient WebhookClient = FakeData.WebhookClient(WebhookActionType.Create);
-        private static readonly WebhookActionEvent WebhookActionEvent = FakeData.WebhookActionEvent(WebhookClient, WebhookActionType.Create);
+        private readonly Mock<IWebhookDataStore> _dataStore;
+        private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly Mock<IWebhookClientHttpClient> _webhookHttpClient;
+        private readonly WebhookEventsManager _manager;
+        private List<WebhookActionEventResult> _eventResults;
 
-        public CanSendEventsFailureResponse() : base(
-            new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient> { WebhookClient }).SetupClientsGetByEntity(new List<WebhookClient> { WebhookClient }),
-            new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { WebhookActionEvent }, true),
-            new MockWebhookClientHttpClientBuilder().Setup(WebhookActionEvent, WebhookClient, false))
-        { }
+        private readonly WebhookClient _webhookClient;
+        private readonly WebhookActionEvent _webhookActionEvent;
+
+        public CanSendEventsFailureResponse()
+        {
+            _webhookClient = FakeData.WebhookClient(WebhookActionType.Create);
+            _webhookActionEvent = FakeData.WebhookActionEvent(_webhookClient, WebhookActionType.Create);
+
+            _dataStore = new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient> { _webhookClient }).SetupClientsGetByEntity(new List<WebhookClient> { _webhookClient }).Build();
+            _webhookHttpClient = new MockWebhookClientHttpClientBuilder().Setup(_webhookActionEvent, _webhookClient, false).Build();
+            _eventsProcessor = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { _webhookActionEvent }, true).Build();
+            _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, _webhookHttpClient.Object);
+        }
 
         [Fact]
         public void EventsProcessorGetsEvents()
         {
-            EventsProcessor.Verify(x => x.HasEvents(), Times.Once);
-            EventsProcessor.Verify(x => x.GetEvents(), Times.Once);
-            EventsProcessor.VerifyNoOtherCalls();
+            _eventsProcessor.Verify(x => x.HasEvents(), Times.Once);
+            _eventsProcessor.Verify(x => x.GetEvents(), Times.Once);
+            _eventsProcessor.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void DataStoreCanGetClientByEntity()
         {
-            DataStore.Verify(x => x.GetByEntity<object>(WebhookClient, WebhookActionType.Create));
-            DataStore.Verify(x => x.Update(WebhookClient));
-            DataStore.VerifyNoOtherCalls();
+            _dataStore.Verify(x => x.GetByEntity<object>(_webhookClient, WebhookActionType.Create));
+            _dataStore.Verify(x => x.Update(_webhookClient));
+            _dataStore.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void HttpClientCallsWebhookUrl()
         {
-            WebhookHttpClient.Verify(x => x.SendEventToWebhookUrl(WebhookActionEvent, WebhookClient));
-            WebhookHttpClient.VerifyNoOtherCalls();
+            _webhookHttpClient.Verify(x => x.SendEventToWebhookUrl(_webhookActionEvent, _webhookClient));
+            _webhookHttpClient.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void EventResultsAllSuccessful() => EventResults.All(x => x.Success).Should().BeFalse();
+        public void EventResultsAllSuccessful() => _eventResults.All(x => x.Success).Should().BeFalse();
 
-        public async Task InitializeAsync() => EventResults = await Manager.SendEvents();
+        public async Task InitializeAsync() => _eventResults = await _manager.SendEvents();
 
         public async Task DisposeAsync() => await Task.CompletedTask;
     }
 
-    public class CannotSendEvents : WebhookEventsManagerBaseSpec, IAsyncLifetime
+    public class CannotSendEvents : IAsyncLifetime
     {
-        private static readonly WebhookClient WebhookClient = FakeData.WebhookClient(WebhookActionType.Update);
-        private static readonly WebhookActionEvent WebhookActionEvent = FakeData.WebhookActionEvent(WebhookClient, WebhookActionType.Update);
+        private readonly Mock<IWebhookDataStore> _dataStore;
+        private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly Mock<IWebhookClientHttpClient> _webhookHttpClient;
+        private readonly WebhookEventsManager _manager;
+        private List<WebhookActionEventResult> _eventResults;
 
-        public CannotSendEvents() : base(
-            new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient> { WebhookClient }),
-            new MockWebhookActionEventProcessorBuilder().Setup(FakeData.WebhookActionEvents(WebhookClient, 1, WebhookActionType.Update), true),
-            new MockWebhookClientHttpClientBuilder().Setup(WebhookActionEvent, WebhookClient, true))
-        { }
+        private readonly WebhookClient _webhookClient;
+        private readonly WebhookActionEvent _webhookActionEvent;
+
+        public CannotSendEvents()
+        {
+            _webhookClient = FakeData.WebhookClient(WebhookActionType.Update);
+            _webhookActionEvent = FakeData.WebhookActionEvent(_webhookClient, WebhookActionType.Update);
+
+            _dataStore = new MockWebhookDataStoreBuilder().SetupClients(new List<WebhookClient> { _webhookClient }).Build();
+            _webhookHttpClient = new MockWebhookClientHttpClientBuilder().Setup(_webhookActionEvent, _webhookClient, true).Build();
+            _eventsProcessor = new MockWebhookActionEventProcessorBuilder().Setup(FakeData.WebhookActionEvents(_webhookClient, 1, WebhookActionType.Update), true).Build();
+            _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, _webhookHttpClient.Object);
+        }
 
         [Fact]
         public void EventsProcessorGetsEvents()
         {
-            EventsProcessor.Verify(x => x.HasEvents(), Times.Once);
-            EventsProcessor.Verify(x => x.GetEvents(), Times.Once);
-            EventsProcessor.VerifyNoOtherCalls();
+            _eventsProcessor.Verify(x => x.HasEvents(), Times.Once);
+            _eventsProcessor.Verify(x => x.GetEvents(), Times.Once);
+            _eventsProcessor.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void DataStoreCanGetClientByEntity()
         {
-            DataStore.Verify(x => x.GetByEntity<object>(WebhookClient, WebhookActionType.Update));
-            DataStore.VerifyNoOtherCalls();
+            _dataStore.Verify(x => x.GetByEntity<object>(_webhookClient, WebhookActionType.Update));
+            _dataStore.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void EventResultsAllEmpty() => EventResults.Should().BeEmpty();
+        public void EventResultsAllEmpty() => _eventResults.Should().BeEmpty();
 
         [Fact]
-        public void HttpClientDoesntNotMakeAnyCalls() => WebhookHttpClient.VerifyNoOtherCalls();
+        public void HttpClientDoesntNotMakeAnyCalls() => _webhookHttpClient.VerifyNoOtherCalls();
 
-        public async Task InitializeAsync() => EventResults = await Manager.SendEvents();
+        public async Task InitializeAsync() => _eventResults = await _manager.SendEvents();
 
         public async Task DisposeAsync() => await Task.CompletedTask;
     }
 
-    public class CanWriteEvents : WebhookEventsManagerBaseSpec, IAsyncLifetime
+    public class CanWriteEvents : IAsyncLifetime
     {
-        private static readonly WebhookActionEvent WebhookActionEvent =
-            FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
+        private readonly Mock<IWebhookDataStore> _dataStore;
+        private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly WebhookEventsManager _manager;
 
-        public CanWriteEvents() : base(
-            new MockWebhookDataStoreBuilder(),
-            new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent>{ WebhookActionEvent }, true),
-            new MockWebhookClientHttpClientBuilder())
-        { }
+        private readonly WebhookActionEvent _webhookActionEvent;
+
+        public CanWriteEvents()
+        {
+            _webhookActionEvent = FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
+            _dataStore = new MockWebhookDataStoreBuilder().Build();
+            var webhookHttpClient = new MockWebhookClientHttpClientBuilder().Build();
+            _eventsProcessor = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { _webhookActionEvent }, true).Build();
+            _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, webhookHttpClient.Object);
+        }
 
         [Fact]
         public void EventsProcessorWritesEvents()
         {
-            EventsProcessor.Verify(x => x.WriteEvent(WebhookActionEvent), Times.Once);
-            EventsProcessor.VerifyNoOtherCalls();
+            _eventsProcessor.Verify(x => x.WriteEvent(_webhookActionEvent), Times.Once);
+            _eventsProcessor.VerifyNoOtherCalls();
         }
 
-        public async Task InitializeAsync() => await Manager.WriteEvent(WebhookActionEvent);
+        public async Task InitializeAsync() => await _manager.WriteEvent(_webhookActionEvent);
 
         public async Task DisposeAsync() => await Task.CompletedTask;
     }

@@ -1,5 +1,4 @@
 global using Xunit;
-global using MinimalWebHooks.Tests.Base;
 global using MinimalWebHooks.Tests.Builders;
 global using Moq;
 global using MinimalWebHooks.Core.Interfaces;

@@ -6,486 +6,613 @@ namespace MinimalWebHooks.Tests
 {
     public class WebhookClientManagerSpec
     {
-        public class CanGetClients : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanGetClients : IAsyncLifetime
         {
-            public CanGetClients() : base(
-                new MockWebhookDataStoreBuilder().SetupClients(FakeData.WebhookClients(1)),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            public CanGetClients()
+            {
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClients(FakeData.WebhookClients(1)).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClients()
             {
-                DataStore.Verify(x => x.Get(), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.Get(), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Clients found.");
+            public void ResultMessage() => _result.Message.Should().Contain("Clients found.");
 
-            public async Task InitializeAsync() => Result = await Manager.Get();
+            public async Task InitializeAsync() => _result = await _manager.Get();
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanGetClientsByEntity : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanGetClientsByEntity : IAsyncLifetime
         {
-            private static readonly List<WebhookClient> WebhookClients = FakeData.WebhookClients(1);
-            public CanGetClientsByEntity() : base(
-                new MockWebhookDataStoreBuilder().SetupClients(WebhookClients).SetupClientsGetByEntity(WebhookClients),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+            private readonly List<WebhookClient> _webhookClients;
+
+            public CanGetClientsByEntity()
+            {
+                _webhookClients = FakeData.WebhookClients(1);
+
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClients(_webhookClients).SetupClientsGetByEntity(_webhookClients).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
+
 
             [Fact]
             public void DataStoreCanGetClients()
             {
-                DataStore.Verify(x => x.GetByEntity(It.IsAny<WebhookClient>(), WebhookActionType.Create), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetByEntity(It.IsAny<WebhookClient>(), WebhookActionType.Create), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Clients found.");
+            public void ResultMessage() => _result.Message.Should().Contain("Clients found.");
 
-            public async Task InitializeAsync() => Result = await Manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
+            public async Task InitializeAsync() => _result = await _manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotFindClients : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotFindClients : IAsyncLifetime
         {
-            public CannotFindClients() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            public CannotFindClients()
+            {
+                _dataStore = new MockWebhookDataStoreBuilder().Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClients()
             {
-                DataStore.Verify(x => x.Get(), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.Get(), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("No clients found.");
+            public void ResultMessage() => _result.Message.Should().Contain("No clients found.");
 
-            public async Task InitializeAsync() => Result = await Manager.Get();
+            public async Task InitializeAsync() => _result = await _manager.Get();
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotFindClientsByEntity : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotFindClientsByEntity : IAsyncLifetime
         {
-            public CannotFindClientsByEntity() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            public CannotFindClientsByEntity()
+            {
+                _dataStore = new MockWebhookDataStoreBuilder().Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClients()
             {
-                DataStore.Verify(x => x.GetByEntity(It.IsAny<WebhookClient>(), WebhookActionType.Create), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetByEntity(It.IsAny<WebhookClient>(), WebhookActionType.Create), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("No clients found.");
+            public void ResultMessage() => _result.Message.Should().Contain("No clients found.");
 
-            public async Task InitializeAsync() => Result = await Manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
+            public async Task InitializeAsync() => _result = await _manager.GetByEntity(new WebhookClient(), WebhookActionType.Create);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanGetClientById : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanGetClientById : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanGetClientById() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CanGetClientById()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, true), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client found with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client found with Id: {_client.Id}.");
 
-            public async Task InitializeAsync() => Result = await Manager.Get(Client.Id);
+            public async Task InitializeAsync() => _result = await _manager.Get(_client.Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotFindClientById : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotFindClientById : IAsyncLifetime
         {
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
             private static readonly int Id = 1;
 
-            public CannotFindClientById() : base(new MockWebhookDataStoreBuilder(), new MockWebhookClientHttpClientBuilder())
-            { }
+            public CannotFindClientById()
+            {
+                _dataStore = new MockWebhookDataStoreBuilder().Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClient()
             {
-                DataStore.Verify(x => x.GetById(Id, true), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(Id, true), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Client not found with Id: 1.");
+            public void ResultMessage() => _result.Message.Should().Contain("Client not found with Id: 1.");
 
-            public async Task InitializeAsync() => Result = await Manager.Get(Id);
+            public async Task InitializeAsync() => _result = await _manager.Get(Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanSaveClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanSaveClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanSaveClient() : base(
-                new MockWebhookDataStoreBuilder().SetupCreateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CanSaveClient()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupCreateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, true).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndCreateClient()
             {
-                DataStore.Verify(x => x.GetByName(Client.Name));
-                DataStore.Verify(x => x.GetById(Client.Id, false));
-                DataStore.Verify(x => x.Create(Client), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetByName(_client.Name));
+                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.Create(_client), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Successfully created client.");
+            public void ResultMessage() => _result.Message.Should().Contain("Successfully created client.");
 
-            public async Task InitializeAsync() => Result = await Manager.Create(Client);
+            public async Task InitializeAsync() => _result = await _manager.Create(_client);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotSaveKnownClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotSaveKnownClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CannotSaveKnownClient() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupCreateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CannotSaveKnownClient()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client).SetupCreateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, true).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetButNotCreateClient()
             {
-                DataStore.Verify(x => x.GetByName(Client.Name), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetByName(_client.Name), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Client already exists with this name.");
+            public void ResultMessage() => _result.Message.Should().Contain("Client already exists with this name.");
 
-            public async Task InitializeAsync() => Result = await Manager.Create(Client);
+            public async Task InitializeAsync() => _result = await _manager.Create(_client);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotSaveClientWithNoVerifibleWebhookUrl : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotSaveClientWithNoVerifibleWebhookUrl : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CannotSaveClientWithNoVerifibleWebhookUrl() : base(
-                new MockWebhookDataStoreBuilder(),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, false))
-            { } 
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly Mock<IWebhookClientHttpClient> _httpClient;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CannotSaveClientWithNoVerifibleWebhookUrl()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().Build();
+                _httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, false).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, _httpClient.Object);
+            }
 
             [Fact]
-            public void ClientWebhookUrlIsCheck() => HttpClient.Verify(x => x.VerifyWebhookUrl(Client), Times.Once);
+            public void ClientWebhookUrlIsCheck() => _httpClient.Verify(x => x.VerifyWebhookUrl(_client), Times.Once);
 
             [Fact]
-            public void DataStoreIsNotChecked() => DataStore.VerifyNoOtherCalls();
+            public void DataStoreIsNotChecked() => _dataStore.VerifyNoOtherCalls();
 
             [Fact]
-            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
+            public void ResultMessage() => _result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
 
-            public async Task InitializeAsync() => Result = await Manager.Create(Client);
+            public async Task InitializeAsync() => _result = await _manager.Create(_client);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanDisableClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanDisableClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanDisableClient() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CanDisableClient()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndDisableClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, It.IsAny<bool>()));
-                DataStore.Verify(x => x.Update(Client), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, It.IsAny<bool>()));
+                _dataStore.Verify(x => x.Update(_client), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client disabled with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client disabled with Id: {_client.Id}.");
 
             [Fact]
-            public void ClientDisabled() => Result.Data.First().Disabled.Should().BeTrue();
+            public void ClientDisabled() => _result.Data.First().Disabled.Should().BeTrue();
 
-            public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
+            public async Task InitializeAsync() => _result = await _manager.Disable(_client.Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotDisableClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotDisableClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CannotDisableClient() : base(
-                new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+
+            private readonly WebhookClient _client;
+
+            public CannotDisableClient()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetOnly()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, true), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, true), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client not found with Id: {_client.Id}.");
 
-            public async Task InitializeAsync() => Result = await Manager.Disable(Client.Id);
+            public async Task InitializeAsync() => _result = await _manager.Disable(_client.Id);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
         public class CanUpdateClient : IAsyncLifetime
         {
-            protected Mock<IWebhookDataStore> DataStore { get; set; }
-            protected Mock<IWebhookClientHttpClient> HttpClient { get; set; }
-            protected WebhookClientManager Manager { get; set; }
-            protected WebhookDataResult Result { get; set; }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
 
-            private WebhookClient Client;
-            private List<WebhookClientHeader>? OriginalHeaders;
-            private WebhookUpdateCommand Command;
+            private readonly WebhookClient _client;
+            private readonly List<WebhookClientHeader> _originalHeaders;
+            private readonly WebhookUpdateCommand _command;
 
             public CanUpdateClient()
             {
-                Client = FakeData.WebhookClient();
-                OriginalHeaders = Client.ClientHeaders;
-                Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+                _client = FakeData.WebhookClient();
+                _originalHeaders = _client.ClientHeaders!;
+                _command = FakeData.WebhookUpdateCommand(_client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
 
-                DataStore = new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client).Build();
-                HttpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true).Build();
-                Manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, DataStore.Object, HttpClient.Object);
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client, skipDisabledClients: false).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, true).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
             }
 
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false));
-                DataStore.Verify(x => x.Delete(OriginalHeaders!), Times.Once);
-                DataStore.Verify(x => x.Update(Client));
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.Delete(_originalHeaders!), Times.Once);
+                _dataStore.Verify(x => x.Update(_client));
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client updated with Id: {_client.Id}.");
 
             [Fact]
             public void ClientUpdated()
             {
-                Result.Data.First().Disabled.Should().BeTrue();
-                Result.Data.First().ClientHeaders?.Should().HaveCount(1);
-                Result.Data.First().ClientHeaders?.First().Key.Should().Be("Authorization");
-                Result.Data.First().ClientHeaders?.First().Value.Should().Be("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
-                Result.Data.First().WebhookUrl.Should().Be(Client.WebhookUrl);
-                OriginalHeaders.Should().NotBeEquivalentTo(Client.ClientHeaders);
+                _result.Data.First().Disabled.Should().BeTrue();
+                _result.Data.First().ClientHeaders?.Should().HaveCount(1);
+                _result.Data.First().ClientHeaders?.First().Key.Should().Be("Authorization");
+                _result.Data.First().ClientHeaders?.First().Value.Should().Be("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
+                _result.Data.First().WebhookUrl.Should().Be(_client.WebhookUrl);
+                _originalHeaders.Should().NotBeEquivalentTo(_client.ClientHeaders);
             }
 
-            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+            public async Task InitializeAsync() => _result = await _manager.Update(_command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanUpdateClientNoReplacementHeaders : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanUpdateClientNoReplacementHeaders : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false);
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
 
-            public CanUpdateClientNoReplacementHeaders() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
-            { }
+            private readonly WebhookClient _client;
+            private readonly WebhookUpdateCommand _command;
+
+            public CanUpdateClientNoReplacementHeaders()
+            {
+                _client = FakeData.WebhookClient();
+                _command = FakeData.WebhookUpdateCommand(_client.Id, true, false);
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client, skipDisabledClients: false).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, true).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false));
-                DataStore.Verify(x => x.Update(Client));
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.Update(_client));
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client updated with Id: {_client.Id}.");
 
             [Fact]
-            public void ClientUpdated() => Result.Data.First().Disabled.Should().BeTrue();
+            public void ClientUpdated() => _result.Data.First().Disabled.Should().BeTrue();
 
-            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+            public async Task InitializeAsync() => _result = await _manager.Update(_command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CanUpdateClientDeleteHeaders : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanUpdateClientDeleteHeaders : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, true);
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
 
-            public CanUpdateClientDeleteHeaders() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, true))
-            { }
+            private readonly WebhookClient _client;
+            private readonly WebhookUpdateCommand _command;
+
+            public CanUpdateClientDeleteHeaders()
+            {
+                _client = FakeData.WebhookClient();
+                _command = FakeData.WebhookUpdateCommand(_client.Id, true, true);
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client, skipDisabledClients: false).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, true).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false));
-                DataStore.Verify(x => x.Delete(Client.ClientHeaders!), Times.Once);
-                DataStore.Verify(x => x.Update(Client));
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.Delete(_client.ClientHeaders!), Times.Once);
+                _dataStore.Verify(x => x.Update(_client));
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client updated with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client updated with Id: {_client.Id}.");
 
             [Fact]
-            public void ClientUpdated() => Result.Data.First().Disabled.Should().BeTrue();
+            public void ClientUpdated() => _result.Data.First().Disabled.Should().BeTrue();
 
-            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+            public async Task InitializeAsync() => _result = await _manager.Update(_command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotUpdateClientNotFound : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotUpdateClientNotFound : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
 
-            public CannotUpdateClientNotFound() : base(
-                new MockWebhookDataStoreBuilder().SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly WebhookClient _client;
+            private readonly WebhookUpdateCommand _command;
+
+            public CannotUpdateClientNotFound()
+            {
+                _client = FakeData.WebhookClient();
+                _command = FakeData.WebhookUpdateCommand(_client.Id, true, false, new Dictionary<string, string> { { "Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=" } });
+
+                _dataStore = new MockWebhookDataStoreBuilder().SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetOnly()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Client not found with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Client not found with Id: {_client.Id}.");
 
-            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+            public async Task InitializeAsync() => _result = await _manager.Update(_command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
 
-        public class CannotUpdateClientInvalidUrl : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CannotUpdateClientInvalidUrl : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            private static readonly WebhookUpdateCommand Command = FakeData.WebhookUpdateCommand(Client.Id, false, false);
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
 
-            public CannotUpdateClientInvalidUrl() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder().SetupVerify(Client, false))
-            { }
+            private readonly WebhookClient _client;
+            private readonly WebhookUpdateCommand _command;
+
+            public CannotUpdateClientInvalidUrl()
+            {
+                _client = FakeData.WebhookClient();
+                _command = FakeData.WebhookUpdateCommand(_client.Id, false, false);
+
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client, skipDisabledClients: false).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().SetupVerify(_client, false).Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetAndUpdateClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsNotSuccessful() => Result.Success.Should().BeFalse();
+            public void ResultSuccess() => _result.Success.Should().BeFalse();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
+            public void ResultMessage() => _result.Message.Should().Contain("Cannot verify client 'WebhookUrl'. Make sure the URL can receive a HEAD request or do not set 'WebhookUrlIsReachable'.");
 
-            public async Task InitializeAsync() => Result = await Manager.Update(Command);
+            public async Task InitializeAsync() => _result = await _manager.Update(_command);
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
         
-        public class CanAddLogToClient : WebhookClientManagerBaseSpec, IAsyncLifetime
+        public class CanAddLogToClient : IAsyncLifetime
         {
-            private static readonly WebhookClient Client = FakeData.WebhookClient();
-            public CanAddLogToClient() : base(
-                new MockWebhookDataStoreBuilder().SetupClient(Client, skipDisabledClients: false).SetupUpdateClient(Client),
-                new MockWebhookClientHttpClientBuilder())
-            { }
+            private readonly Mock<IWebhookDataStore> _dataStore;
+            private readonly WebhookClientManager _manager;
+            private WebhookDataResult _result;
+            private readonly WebhookClient _client;
+
+            public CanAddLogToClient()
+            {
+                _client = FakeData.WebhookClient();
+                _dataStore = new MockWebhookDataStoreBuilder().SetupClient(_client, skipDisabledClients: false).SetupUpdateClient(_client).Build();
+                var httpClient = new MockWebhookClientHttpClientBuilder().Build();
+                _manager = new WebhookClientManager(new Mock<ILogger<WebhookClientManager>>().Object, _dataStore.Object, httpClient.Object);
+            }
 
             [Fact]
             public void DataStoreCanGetClient()
             {
-                DataStore.Verify(x => x.GetById(Client.Id, false));
-                DataStore.Verify(x => x.Update(Client), Times.Once);
-                DataStore.VerifyNoOtherCalls();
+                _dataStore.Verify(x => x.GetById(_client.Id, false));
+                _dataStore.Verify(x => x.Update(_client), Times.Once);
+                _dataStore.VerifyNoOtherCalls();
             }
 
             [Fact]
-            public void ResultIsSuccessful() => Result.Success.Should().BeTrue();
+            public void ResultSuccess() => _result.Success.Should().BeTrue();
 
             [Fact]
-            public void ResultMessage() => Result.Message.Should().Contain($"Log added to client with Id: {Client.Id}.");
+            public void ResultMessage() => _result.Message.Should().Contain($"Log added to client with Id: {_client.Id}.");
 
-            public async Task InitializeAsync() => Result = await Manager.AddLogToClient(Client.Id, new WebhookClientActivityLog().CreateLog(ActivityLogType.CalledWebhookUrl, "Called Webhook Url"));
+            public async Task InitializeAsync() => _result = await _manager.AddLogToClient(_client.Id, new WebhookClientActivityLog().CreateLog(ActivityLogType.CalledWebhookUrl, "Called Webhook Url"));
 
             public async Task DisposeAsync() => await Task.CompletedTask;
         }
