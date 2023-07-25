@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace MinimalWebHooks.Core.Models;
+﻿namespace MinimalWebHooks.Core.Models;
 
 public class UpdateResult
 {

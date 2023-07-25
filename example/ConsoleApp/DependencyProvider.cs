@@ -5,7 +5,6 @@ using MinimalWebHooks.Core.Managers;
 using System.Threading.Channels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace ConsoleApp;
 

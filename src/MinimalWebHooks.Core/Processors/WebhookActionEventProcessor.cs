@@ -1,7 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-using System.Threading;
-using System.Threading.Channels;
-using MinimalWebHooks.Core.Extensions;
+﻿using System.Threading.Channels;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 

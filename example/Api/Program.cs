@@ -1,5 +1,4 @@
 using System.Threading.Channels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MinimalWebHooks.Web.Extensions.Startup;
 

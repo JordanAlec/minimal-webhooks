@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MinimalWebHooks.Core.Managers;
-using MinimalWebHooks.Core.Models;
 using MinimalWebHooks.Web.Models;
 
 namespace MinimalWebHooks.Web;

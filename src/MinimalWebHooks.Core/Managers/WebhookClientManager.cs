@@ -5,11 +5,9 @@ using MinimalWebHooks.Core.Models;
 using MinimalWebHooks.Core.Models.DbSets;
 using MinimalWebHooks.Core.Validation;
 using MinimalWebHooks.Core.Validation.Rules;
-using System;
 using MinimalWebHooks.Core.Extensions;
 using MinimalWebHooks.Core.Strategies;
 using MinimalWebHooks.Core.Strategies.Updates;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MinimalWebHooks.Core.Managers;
 

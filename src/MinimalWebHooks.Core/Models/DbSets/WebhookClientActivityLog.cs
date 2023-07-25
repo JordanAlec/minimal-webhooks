@@ -1,5 +1,4 @@
-﻿using System.Net;
-using MinimalWebHooks.Core.Enum;
+﻿using MinimalWebHooks.Core.Enum;
 using System.Text.Json;
 
 namespace MinimalWebHooks.Core.Models.DbSets;

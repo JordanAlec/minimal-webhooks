@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MinimalWebHooks.Core.Interfaces;
 using MinimalWebHooks.Core.Models;
 using MinimalWebHooks.Core.Models.DbSets;
