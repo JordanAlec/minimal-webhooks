@@ -46,13 +46,13 @@ public class WebhookClientActivityLog
         });
     }
 
-    public WebhookClientActivityLog CreateWebhookCallLog(WebhookClient client, int statusCode, string? message)
+    public WebhookClientActivityLog CreateWebhookCallLog(WebhookClient client, WebhookActionEventResult eventResult)
     {
-        var logMessage = string.IsNullOrWhiteSpace(message) ? "No response message" : message;
+        var logMessage = string.IsNullOrWhiteSpace(eventResult.Message) ? "No response message" : eventResult.Message;
         return CreateWebhookLog(client, activityLog =>
         {
             activityLog.LogType = ActivityLogType.CalledWebhookUrl;
-            activityLog.Log = $"Client called Url: {client.WebhookUrl}. Status code returned: {statusCode}. Message: {logMessage}";
+            activityLog.Log = $"Client called Url: {client.WebhookUrl}. Status code returned: {eventResult.StatusCode}. Message returned: {logMessage}. Event sent: {JsonSerializer.Serialize(eventResult.WebhookActionEvent)}";
         });
     }
 

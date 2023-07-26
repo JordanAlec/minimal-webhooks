@@ -56,7 +56,7 @@ public class WebhookEventsManager
     public async Task<bool> AddLogToClient(WebhookClient client, WebhookActionEventResult actionEvent)
     {
         client.ActivityLogs ??= new List<WebhookClientActivityLog>();
-        client.ActivityLogs.Add(new WebhookClientActivityLog().CreateWebhookCallLog(client, actionEvent.StatusCode, actionEvent.Message));
+        client.ActivityLogs.Add(new WebhookClientActivityLog().CreateWebhookCallLog(client, actionEvent));
         var addedLog = await _dataStore.Update(client);
         _logger.LogDebug("{logger}: Added log to client ({id}): {success}", nameof(WebhookEventsManager), client.Id, addedLog);
         return addedLog;
