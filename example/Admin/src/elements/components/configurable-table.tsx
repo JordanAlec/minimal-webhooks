@@ -16,7 +16,7 @@ type Props = {
 const ConfigurableTable = ({tableMinWidth, tableHeaders, tableDataRows} : Props) => {
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{maxHeight: 250}}>
         <Table sx={{ minWidth: tableMinWidth }}>
             <TableHead>
                 {tableHeaders}

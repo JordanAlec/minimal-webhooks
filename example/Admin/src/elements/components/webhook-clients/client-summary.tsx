@@ -1,4 +1,8 @@
 import Error from '@/elements/components/error';
+import ClientActivityLogTableElevated
+  from '@/elements/components/webhook-clients/client-activity-log-table-elevated';
+import ClientHeadersTableElevated
+  from '@/elements/components/webhook-clients/client-headers-table-elevated';
 import ClientSummaryDetails
   from '@/elements/components/webhook-clients/client-summary-details';
 import DisableClient
@@ -11,8 +15,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-
-import ClientHeadersTableElevated from './client-headers-table-elevated';
 
 type Props = {
     client: WebhookClient
@@ -37,6 +39,9 @@ const ClientSummary = ({client}: Props) => {
         </Grid>
         <Grid item xs={5}>
           <ClientHeadersTableElevated titleHeader='Headers' clientHeaders={client.clientHeaders} />
+        </Grid>
+        <Grid item xs={12}>
+          <ClientActivityLogTableElevated titleHeader='Logs' clientActivityLogs={client.activityLogs} />
         </Grid>
         <Grid item xs={12}>
           <Typography color='text.secondary' align="center" sx={{marginBottom: 2}}>Actions</Typography>

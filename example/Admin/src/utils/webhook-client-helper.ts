@@ -14,6 +14,19 @@ export const actionTypeConversion = (actionType: number) => {
     }
 }
 
+export const logTypeConversion = (logType: number) => {
+    switch (logType) {
+        case 0:
+            return 'Created Client';
+        case 1:
+            return 'Updated Client';
+        case 2:
+            return 'Called Webhook Url';
+        default:
+            return 'Unknown';
+    }
+}
+
 export const HeaderExistsOnClient = (webhookClient: WebhookClient, headerToCheck: WebhookClientHeader) => {
     const isFound = webhookClient.clientHeaders?.some(header => {
         if (header.key === headerToCheck.key) return true;

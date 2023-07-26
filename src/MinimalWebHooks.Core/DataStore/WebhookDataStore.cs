@@ -18,7 +18,7 @@ public class WebhookDataStore : IWebhookDataStore
         if (skipDisabledClients) clientsQueryable = clientsQueryable.Where(x => !x.Disabled).AsQueryable();
         return await clientsQueryable
             .Include(x => x.ClientHeaders)
-            .Include(x => x.ActivityLogs.Where(x => x.TimeStamp > DateTime.Today.AddMonths(-includeLastNumOfLogsInMonths)))
+            .Include(x => x.ActivityLogs.Where(x => x.TimeStamp > DateTime.Today.AddMonths(-includeLastNumOfLogsInMonths)).OrderByDescending(x => x.Id))
             .FirstOrDefaultAsync();
     }
 

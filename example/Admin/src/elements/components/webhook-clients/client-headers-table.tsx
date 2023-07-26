@@ -17,34 +17,34 @@ const ClientHeadersTable = ({clientHeaders, removeHeader} : Props) => {
     <ConfigurableTable 
     tableMinWidth={250} 
     tableHeaders={
-    <TableRow>
-      <TableCell></TableCell>
-      <TableCell>Key</TableCell>
-      <TableCell>Value</TableCell>
-      {removeHeader ? <TableCell></TableCell> : <></>}
-      <TableCell></TableCell>
-    </TableRow>
-  } 
-  tableDataRows={
-    <>
-      {data.map((clientHeader) => (
-        <TableRow
-          key={clientHeader.id}
-          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-        >
-          <TableCell></TableCell>
-          <TableCell component="th" scope="row">{clientHeader.key}</TableCell>
-          <TableCell component="th">{clientHeader.value}</TableCell>
-          {removeHeader ? 
-            <TableCell component="th">
-              <Button variant="contained" color="error" onClick={() => removeHeader(clientHeader)}>Delete</Button>
-            </TableCell> : <></>
-          }
-          <TableCell></TableCell>
-        </TableRow>
-      ))}
-    </>
-  } />
+      <TableRow>
+        <TableCell></TableCell>
+        <TableCell>Key</TableCell>
+        <TableCell>Value</TableCell>
+        {removeHeader ? <TableCell></TableCell> : <></>}
+        <TableCell></TableCell>
+      </TableRow>
+    } 
+    tableDataRows={
+      <>
+        {data.map((clientHeader) => (
+          <TableRow
+            key={clientHeader.id}
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          >
+            <TableCell></TableCell>
+            <TableCell component="th" scope="row">{clientHeader.key}</TableCell>
+            <TableCell component="th">{clientHeader.value}</TableCell>
+            {removeHeader ? 
+              <TableCell component="th">
+                <Button variant="contained" color="error" onClick={() => removeHeader(clientHeader)}>Delete</Button>
+              </TableCell> : <></>
+            }
+            <TableCell></TableCell>
+          </TableRow>
+        ))}
+      </>
+    } />
   )
 }
 

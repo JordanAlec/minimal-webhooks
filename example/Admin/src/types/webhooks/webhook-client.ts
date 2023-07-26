@@ -1,3 +1,6 @@
+import {
+  WebhookClientActivityLog,
+} from '@/types/webhooks/webhook-client-activity-log';
 import { WebhookClientHeader } from '@/types/webhooks/webhook-client-header';
 
 export type WebhookClient = {
@@ -7,5 +10,6 @@ export type WebhookClient = {
     actionType: number,
     entityTypeName: string,
     disabled: boolean,
-    clientHeaders?: WebhookClientHeader[]
+    clientHeaders?: WebhookClientHeader[],
+    activityLogs?: WebhookClientActivityLog[]
 }
