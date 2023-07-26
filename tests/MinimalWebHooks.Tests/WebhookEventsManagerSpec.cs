@@ -164,6 +164,7 @@ public class WebhookEventsManagerSpec
     {
         private readonly Mock<IWebhookDataStore> _dataStore;
         private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly MockWebhookActionEventProcessorBuilder _eventsProcessorBuilder;
         private readonly WebhookEventsManager _manager;
 
         private readonly WebhookActionEvent _webhookActionEvent;
@@ -173,7 +174,8 @@ public class WebhookEventsManagerSpec
             _webhookActionEvent = FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
             _dataStore = new MockWebhookDataStoreBuilder().Build();
             var webhookHttpClient = new MockWebhookClientHttpClientBuilder().Build();
-            _eventsProcessor = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { _webhookActionEvent }, true).Build();
+            _eventsProcessorBuilder = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> { _webhookActionEvent }, true);
+            _eventsProcessor = _eventsProcessorBuilder.Build();
             _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, webhookHttpClient.Object);
         }
 
@@ -183,6 +185,44 @@ public class WebhookEventsManagerSpec
             _eventsProcessor.Verify(x => x.WriteEvent(_webhookActionEvent), Times.Once);
             _eventsProcessor.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public void EventWritten() => _eventsProcessorBuilder.GetWrittenEvents().Should().ContainEquivalentOf(_webhookActionEvent);
+
+        public async Task InitializeAsync() => await _manager.WriteEvent(_webhookActionEvent);
+
+        public async Task DisposeAsync() => await Task.CompletedTask;
+    }
+
+    public class CanWriteEventsWithUdfs : IAsyncLifetime
+    {
+        private readonly Mock<IWebhookDataStore> _dataStore;
+        private readonly Mock<IWebhookActionEventProcessor> _eventsProcessor;
+        private readonly MockWebhookActionEventProcessorBuilder _eventsProcessorBuilder;
+        private readonly WebhookEventsManager _manager;
+
+        private readonly WebhookActionEvent _webhookActionEvent;
+
+        public CanWriteEventsWithUdfs()
+        {
+            _webhookActionEvent = FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
+            _webhookActionEvent.AddUdf(FakeData.WebhookActionEventUdf());
+            _dataStore = new MockWebhookDataStoreBuilder().Build();
+            var webhookHttpClient = new MockWebhookClientHttpClientBuilder().Build();
+            _eventsProcessorBuilder = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> {_webhookActionEvent}, true);
+            _eventsProcessor = _eventsProcessorBuilder.Build();
+            _manager = new WebhookEventsManager(new Mock<ILogger<WebhookEventsManager>>().Object, _dataStore.Object, _eventsProcessor.Object, webhookHttpClient.Object);
+        }
+
+        [Fact]
+        public void EventsProcessorWritesEvents()
+        {
+            _eventsProcessor.Verify(x => x.WriteEvent(_webhookActionEvent), Times.Once);
+            _eventsProcessor.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void EventWritten() => _eventsProcessorBuilder.GetWrittenEvents().Should().ContainEquivalentOf(_webhookActionEvent);
 
         public async Task InitializeAsync() => await _manager.WriteEvent(_webhookActionEvent);
 

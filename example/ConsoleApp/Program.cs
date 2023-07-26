@@ -35,8 +35,8 @@ namespace ConsoleApp
             var newCustomer = new Customer {Id = 1, FullName = "JordanAlec"};
 
             // We've created the customer in our DB, lets raise an 'event' that can be picked up later to send the creation update to our client's webhook url
-            // We create a new event by creating a new 'WebhookActionEvent' object and call .CreateEvent, passing in the data you want to send and the CRUD action
-            await eventsManager.WriteEvent(await new WebhookActionEvent().CreateEvent(newCustomer, WebhookActionType.Create));
+            // We create a new event by creating a new 'WebhookActionEvent' object and call .Create, passing in the data you want to send and the CRUD action
+            await eventsManager.WriteEvent(await new WebhookActionEvent().Create(newCustomer, WebhookActionType.Create));
 
             // This will send all events on the queue, written from 'WriteEvents' above.
             var sendEventResults = await eventsManager.SendEvents();

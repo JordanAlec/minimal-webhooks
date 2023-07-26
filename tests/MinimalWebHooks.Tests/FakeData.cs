@@ -29,9 +29,17 @@ public static class FakeData
             .RuleFor(x => x.EntityTypeName, data.GetEntityTypeName())
             .RuleFor(x => x.Source, f => f.Internet.Ip());
 
+    private static Faker<WebhookActionEventUdf> FakeWebhookActionEventUdf() =>
+        new Faker<WebhookActionEventUdf>()
+            .RuleFor(x => x.Key, f => f.Random.Word())
+            .RuleFor(x => x.Value, f => f.Random.Word());
+
     public static WebhookActionEvent WebhookActionEvent<T>(T data, WebhookActionType? actionType = null) => FakeWebhookActionEvent(data, actionType);
 
     public static List<WebhookActionEvent> WebhookActionEvents<T>(T data, int generate, WebhookActionType? actionType = null) => FakeWebhookActionEvent(data, actionType).Generate(generate);
+
+    public static WebhookActionEventUdf WebhookActionEventUdf() => FakeWebhookActionEventUdf();
+    public static List<WebhookActionEventUdf> WebhookActionEventUdfs(int generate) => FakeWebhookActionEventUdf().Generate(generate);
 
     public static WebhookUpdateCommand WebhookUpdateCommand(int id, bool disabledFlag, bool deleteHeaders, Dictionary<string, string>? headers = null) =>
         new Faker<WebhookUpdateCommand>()

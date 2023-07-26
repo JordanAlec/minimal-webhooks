@@ -46,7 +46,13 @@ The events are sent via a POST request to the webhook client's url. How that is 
     "FullName": "JordanAlec"
   },
   "EntityTypeName": "ConsoleApp.Models.Customer",
-  "Source": "24.221.88.118"
+  "Source": "24.221.88.118",
+  "Udfs": [
+    {
+        "key": "example key",
+        "value": "example value"
+    }
+  ]
 }
 ```
 
@@ -54,6 +60,8 @@ The events are sent via a POST request to the webhook client's url. How that is 
 - EventTimestamp is when the event was raised, not sent.
 - Entity is the object data from the event. This is passed in when creating the event. This is the data that was raised from the above action type. For example, this entity above was created and this is the data that was created.
 - EntityTypeName is the full name from the 'type' of object passed in from creating the event. It is generated from the full name of the type. It is the full namespace plus the type name.
+- Source is the external IP address of host you install the package on. For example, your computer, your API, etc.
+- Udfs is a list of 'user defined fields' that you can add to an event. You can pass in a list into the "Create()" call from an "WebhookActionEvent" or call "AddUdf" on "WebhookActionEvent" to add single udfs at a time.
 
 Additional headers can be passed in that are configurable from a webhook client standpoint.
 This could be things like:
@@ -136,5 +144,5 @@ The logging should assist to identify issues.
 Common issues include:
 - The WebhookUrl not being set or that the URL cannot recieve a HEAD request. You can disable this check by removing the 'webhookOptions.WebhookUrlIsReachable()' call.
 - The WebhookActionType not matching the client to the event. All events are sent by looking through the clients that have subscribed to a particular action type.
-- The EntityTypeName not matching the 'data' passed into the event. The 'CreateEvent' call is generic. The EntityTypeName must match the full type name or you can call 'GetEntityTypeName' on any object.
+- The EntityTypeName not matching the 'data' passed into the event. The 'Create' call is generic. The EntityTypeName must match the full type name or you can call 'GetEntityTypeName' on any object.
 - Disabled flag on the client is set to 'true'. Not events are passed to disabled clients.
