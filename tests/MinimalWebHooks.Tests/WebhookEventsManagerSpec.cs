@@ -206,7 +206,8 @@ public class WebhookEventsManagerSpec
         public CanWriteEventsWithUdfs()
         {
             _webhookActionEvent = FakeData.WebhookActionEvent(FakeData.WebhookClient(WebhookActionType.Create), WebhookActionType.Create);
-            _webhookActionEvent.AddUdf(FakeData.WebhookActionEventUdf());
+            var actionEvent = FakeData.WebhookActionEventUdf();
+            _webhookActionEvent.AddUdf(actionEvent.Key, actionEvent.Value);
             _dataStore = new MockWebhookDataStoreBuilder().Build();
             var webhookHttpClient = new MockWebhookClientHttpClientBuilder().Build();
             _eventsProcessorBuilder = new MockWebhookActionEventProcessorBuilder().Setup(new List<WebhookActionEvent> {_webhookActionEvent}, true);

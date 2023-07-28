@@ -137,8 +137,7 @@ public class WebhookClientManager
     {
         var client = await _dataStore.GetById(id, false);
         if (client == null) return new WebhookDataResult().FailedResult($"Client not found with Id: {id}.");
-        client.ActivityLogs ??= new List<WebhookClientActivityLog>();
-        client.ActivityLogs.Add(log);
+        client.ActivityLogs ??= new List<WebhookClientActivityLog>{ log };
         var addedLog = await _dataStore.Update(client);
         _logger.LogDebug("{logger}: Added log to client ({id}): {success}", nameof(WebhookClientManager), id, addedLog);
         return addedLog

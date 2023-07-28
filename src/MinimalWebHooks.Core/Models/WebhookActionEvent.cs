@@ -26,10 +26,10 @@ public class WebhookActionEvent
         return this;
     }
 
-    public WebhookActionEvent AddUdf(WebhookActionEventUdf eventUdf)
+    public WebhookActionEvent AddUdf(string key, string value)
     {
         Udfs ??= new List<WebhookActionEventUdf>();
-        Udfs.Add(eventUdf);
+        Udfs.Add(new WebhookActionEventUdf().Create(key, value));
         return this;
     }
 
