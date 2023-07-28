@@ -15,10 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.9" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\MinimalWebHooks.Core\MinimalWebHooks.Core.csproj" />
+    <PackageReference Include="MinimalWebHooks.Core" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
