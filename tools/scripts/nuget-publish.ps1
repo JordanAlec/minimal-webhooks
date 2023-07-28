@@ -1,0 +1,1 @@
+dotnet nuget push **/*.nupkg --source https://nuget.pkg.github.com/jordanalec/index.json --api-key KEY --skip-duplicate
