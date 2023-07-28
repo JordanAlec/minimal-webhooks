@@ -146,3 +146,17 @@ Common issues include:
 - The WebhookActionType not matching the client to the event. All events are sent by looking through the clients that have subscribed to a particular action type.
 - The EntityTypeName not matching the 'data' passed into the event. The 'Create' call is generic. The EntityTypeName must match the full type name or you can call 'GetEntityTypeName' on any object.
 - Disabled flag on the client is set to 'true'. Not events are passed to disabled clients.
+
+### Admin
+This example is a typescript next.js application that calls the [Api](#api) example.
+Features include: getting list of webhook clients, viewing client details, viewing activity logs, creating new clients, disabling / re-enabling clients.
+This example is currently incomplete and was created to show an example of how to create a front-end to management webhook clients. 
+
+Further notes:
+
+- If you are not running the [Api](#api) example project you will see alerts erroring when going to the various clients page. 
+- If you want to adjust the Api url it calls adjust the "WEBHOOKS_API_URL" environment variable within the .env.development file.
+- NODE_TLS_REJECT_UNAUTHORIZED = '0' is used as it's assumed your running the Api and Admin example locally.
+
+The focus of this example is to provide a [demo frontend for an (largely) api only package](https://www.thoughtworks.com/radar/techniques/demo-frontends-for-api-only-products). As such this example is not meant to be extensive and/or exhaustive.
+There is no security configured within the front end and assumes the webhooks api endpoints can be accessed anonymously. Because of this it is not recommended to use and deploy this front end "as is", but feel free to use this or any examples as a basis for your own applications.
